@@ -49,6 +49,12 @@ function _alias_gs {
 }
 Set-Alias -Name 'gs' -Value _alias_gs -Option AllScope -Force
 
+# Displays in short form the current state of your Git working directory and staging area
+function _alias_gss {
+  _YaffaCall 'gss' 'git status -sb' 'Displays in short form the current state of your Git working directory and staging area' @args
+}
+Set-Alias -Name 'gss' -Value _alias_gss -Option AllScope -Force
+
 # Changes in the working tree not yet staged for the next commit
 function _alias_gd {
   _YaffaCall 'gd' 'git diff' 'Changes in the working tree not yet staged for the next commit' @args
@@ -83,10 +89,13 @@ function _alias_gco {
 Set-Alias -Name 'gco' -Value _alias_gco -Option AllScope -Force
 
 # Create and switch to a new branch
-function _alias_gcb {
-  _YaffaCall 'gcb' 'git checkout -b' 'Create and switch to a new branch' @args
+function _alias_gcob {
+  _YaffaCall 'gcob' 'git checkout -b' 'Create and switch to a new branch' @args
 }
-Set-Alias -Name 'gcb' -Value _alias_gcb -Option AllScope -Force
+Set-Alias -Name 'gcob' -Value _alias_gcob -Option AllScope -Force
+
+# Create and switch to a new branch
+Set-Alias -Name 'gcb' -Value _alias_gcob -Option AllScope -Force
 
 # List, create, or delete branches
 function _alias_gb {

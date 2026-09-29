@@ -1,0 +1,13 @@
+title: alias_overrides - My overrides of aliases from YAFFA
+
+aliases:
+  - name: a4g
+    description: Show all git related aliases (pretty)
+    command:
+      bash: alias-match git | pretty_aliases
+
+  - name: a4g-
+    description: Show all NONE git related aliases (pretty)
+    command:
+      bash: alias-match - git | pretty_aliases
+

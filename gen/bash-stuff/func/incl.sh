@@ -1,4 +1,5 @@
 #!/bin/bash
+# YAFFA/config/bash/incl.sh
 # Configure in ~/.bashrc before sourcing this file:
 #
 #   readonly YAFFA_GEN="$HOME/.yaffa/gen/bash-stuff"   # <user folder>/gen/bash-stuff
@@ -7,12 +8,17 @@
 
 _bs_func="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 _bs_root="${YAFFA_GEN:-${_bs_func%/*}}" # No YAFFA_GEN strips the last path segment from _bs_func
+# The user folder whose config/func/bash/ functions are sourced last (below) —
+# the same default as the generators. A leading '~' is expanded here, since a
+# quoted YAFFA_USER_FOLDER='~/...' in ~/.bashrc isn't tilde-expanded by bash.
+_bs_user="${YAFFA_USER_FOLDER:-$HOME/.yaffa}"
+_bs_user="${_bs_user/#\~/$HOME}"
 
 # Abbreviate $HOME as '~'. The tilde must be escaped: an unescaped one is
 # tilde-expanded back into $HOME before the substitution, so nothing changes.
 printf 'YAFFA included and initialized by "%s":\n' "${BASH_SOURCE[0]/#"$HOME"/\~}"
-printf '\n  YAFFA_GEN = "%s"\n  YAFFA_INCL = "%s"\n\t _bs_root = "%s"\n\n' \
-  "$YAFFA_PATH" "$YAFFA_INCL" "${_bs_root/#"$HOME"/\~}"
+printf '\n  YAFFA_GEN = "%s"\n  YAFFA_INCL = "%s"\n  YAFFA_USER_FOLDER = "%s"\n\t _bs_root = "%s"\n\n' \
+  "${YAFFA_GEN/#"$HOME"/\~}" "$YAFFA_INCL" "${_bs_user/#"$HOME"/\~}" "${_bs_root/#"$HOME"/\~}"
 
 # Guarded: incl.sh can be re-sourced within the same shell process (e.g. bats
 # runs every @test in one file's process sequentially), and a plain 'readonly'
@@ -198,10 +204,13 @@ else
 fi
 
 for _bs_f in "${_bs_func}"/*.sh; do
-  [[ "$_bs_f" != "${BASH_SOURCE[0]}" && "${_bs_f##*/}" != user.sh ]] && [[ -f "$_bs_f" ]] && source "$_bs_f"
+  [[ "$_bs_f" != "${BASH_SOURCE[0]}" ]] && [[ -f "$_bs_f" ]] && source "$_bs_f"
 done
-# The user's own functions (generated from their user folder's config/func/bash/)
-# are sourced last, so a function they redefine wins over the project's.
-[[ -f "${_bs_func}/user.sh" ]] && source "${_bs_func}/user.sh"
+# The user's own functions, straight from their user folder's config/func/bash/
+# (not generated), are sourced last, so a function they redefine wins over the
+# project's. No such folder loads nothing.
+for _bs_f in "${_bs_user}/config/func/bash"/*.sh; do
+  [[ -f "$_bs_f" ]] && source "$_bs_f"
+done
 
-unset _bs_func _bs_root _bs_groups _bs_g _bs_f
+unset _bs_func _bs_root _bs_user _bs_groups _bs_g _bs_f

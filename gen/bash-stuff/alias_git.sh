@@ -2,6 +2,12 @@
 # Generated content — do not edit directly.
 # Edit alias_git.yaml and re-run YAFFA generator.
 
+# Show all git related aliases (pretty)
+alias a4g='_YaffaCall a4g '\''alias-match git | pretty_aliases'\'' '\''Show all git related aliases (pretty)'\'''
+
+# Show all NONE git related aliases (pretty)
+alias a4g-='_YaffaCall a4g- '\''alias-match - git | pretty_aliases'\'' '\''Show all NONE git related aliases (pretty)'\'''
+
 # Short alias for git add
 alias ga='_YaffaCall ga '\''git add'\'' '\''Short alias for git add'\'''
 
@@ -29,6 +35,9 @@ alias gp='_YaffaCall gp '\''git push'\'' '\''Short alias for git push'\'''
 # Displays the current state of your Git working directory and staging area
 alias gs='_YaffaCall gs '\''git status'\'' '\''Displays the current state of your Git working directory and staging area'\'''
 
+# Displays in short form the current state of your Git working directory and staging area
+alias gss='_YaffaCall gss '\''git status -sb'\'' '\''Displays in short form the current state of your Git working directory and staging area'\'''
+
 # Changes in the working tree not yet staged for the next commit
 alias gd='_YaffaCall gd '\''git diff'\'' '\''Changes in the working tree not yet staged for the next commit'\'''
 
@@ -46,6 +55,9 @@ alias gdss='_YaffaCall gdss '\''git diff --staged --stat'\'' '\''Show the total 
 
 # Switch branches or restore working tree files
 alias gco='_YaffaCall gco '\''git checkout'\'' '\''Switch branches or restore working tree files'\'''
+
+# Create and switch to a new branch
+alias gcob='_YaffaCall gcob '\''git checkout -b'\'' '\''Create and switch to a new branch'\'''
 
 # Create and switch to a new branch
 alias gcb='_YaffaCall gcb '\''git checkout -b'\'' '\''Create and switch to a new branch'\'''

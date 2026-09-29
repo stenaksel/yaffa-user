@@ -13,53 +13,59 @@ function _alias_req_gtemp_dir {
 }
 Set-Alias -Name 'req_gtemp_dir' -Value _alias_req_gtemp_dir -Option AllScope -Force
 
-# Run the Gradle wrapper with the given tasks/options (e.g. 'gw run')
-function _alias_gw {
+# Run the Gradle wrapper with the given tasks/options (e.g. 'gr run')
+function _alias_gr {
   if (-not (_YaffaReq 'file' 'gradlew' 'No gradlew — run from a Gradle project root (with the Gradle wrapper)' '' '' 'abort')) { return }
-  _YaffaCall 'gw' './gradlew' 'Run the Gradle wrapper with the given tasks/options (e.g. ''gw run'')' @args
+  _YaffaCall 'gr' './gradlew' 'Run the Gradle wrapper with the given tasks/options (e.g. ''gr run'')' @args
 }
-Set-Alias -Name 'gw' -Value _alias_gw -Option AllScope -Force
+Set-Alias -Name 'gr' -Value _alias_gr -Option AllScope -Force
 
-# Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin)
-function _alias_gci {
+# "Clean Install" - Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin)
+function _alias_grci {
   if (-not (_YaffaReq 'file' 'gradlew' 'No gradlew — run from a Gradle project root (with the Gradle wrapper)' '' '' 'abort')) { return }
-  _YaffaCall 'gci' './gradlew clean build publishToMavenLocal' 'Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin)' @args
+  _YaffaCall 'grci' './gradlew clean build publishToMavenLocal' '"Clean Install" - Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin)' @args
 }
-Set-Alias -Name 'gci' -Value _alias_gci -Option AllScope -Force
+Set-Alias -Name 'grci' -Value _alias_grci -Option AllScope -Force
 
-# Fast project build skipping test execution
-function _alias_gcist {
+# "Clean Install (no tests)" - Fast project build skipping test execution
+function _alias_grci- {
   if (-not (_YaffaReq 'file' 'gradlew' 'No gradlew — run from a Gradle project root (with the Gradle wrapper)' '' '' 'abort')) { return }
-  _YaffaCall 'gcist' './gradlew clean build publishToMavenLocal -x test' 'Fast project build skipping test execution' @args
+  _YaffaCall 'grci-' './gradlew clean build publishToMavenLocal -x test' '"Clean Install (no tests)" - Fast project build skipping test execution' @args
 }
-Set-Alias -Name 'gcist' -Value _alias_gcist -Option AllScope -Force
+Set-Alias -Name 'grci-' -Value _alias_grci- -Option AllScope -Force
 
-# Package the project (e.g. JAR) without installing to local repository
-function _alias_gcp {
+# "clean build" - Package the project (e.g. JAR) without installing to local repository
+function _alias_grcb {
   if (-not (_YaffaReq 'file' 'gradlew' 'No gradlew — run from a Gradle project root (with the Gradle wrapper)' '' '' 'abort')) { return }
-  _YaffaCall 'gcp' './gradlew clean build' 'Package the project (e.g. JAR) without installing to local repository' @args
+  _YaffaCall 'grcb' './gradlew clean build' '"clean build" - Package the project (e.g. JAR) without installing to local repository' @args
 }
-Set-Alias -Name 'gcp' -Value _alias_gcp -Option AllScope -Force
+Set-Alias -Name 'grcb' -Value _alias_grcb -Option AllScope -Force
+
+# "clean build" - Package the project (e.g. JAR) without installing to local repository
+Set-Alias -Name 'grp' -Value _alias_grcb -Option AllScope -Force
 
 # Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)
-function _alias_gcu-d {
+function _alias_grcu-d {
   if (-not (_YaffaReq 'file' 'gradlew' 'No gradlew — run from a Gradle project root (with the Gradle wrapper)' '' '' 'abort')) { return }
-  _YaffaCall 'gcu-d' './gradlew dependencyUpdates' 'Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)' @args
+  _YaffaCall 'grcu-d' './gradlew dependencyUpdates' 'Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)' @args
 }
-Set-Alias -Name 'gcu-d' -Value _alias_gcu-d -Option AllScope -Force
+Set-Alias -Name 'grcu-d' -Value _alias_grcu-d -Option AllScope -Force
 
 # Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)
-Set-Alias -Name 'gcu' -Value _alias_gcu-d -Option AllScope -Force
+Set-Alias -Name 'grcu' -Value _alias_grcu-d -Option AllScope -Force
 
 # Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)
-Set-Alias -Name 'gddu' -Value _alias_gcu-d -Option AllScope -Force
+Set-Alias -Name 'grddu' -Value _alias_grcu-d -Option AllScope -Force
 
 # Display the dependency tree for debugging library conflicts
-function _alias_gdt {
+function _alias_grd {
   if (-not (_YaffaReq 'file' 'gradlew' 'No gradlew — run from a Gradle project root (with the Gradle wrapper)' '' '' 'abort')) { return }
-  _YaffaCall 'gdt' './gradlew dependencies' 'Display the dependency tree for debugging library conflicts' @args
+  _YaffaCall 'grd' './gradlew dependencies' 'Display the dependency tree for debugging library conflicts' @args
 }
-Set-Alias -Name 'gdt' -Value _alias_gdt -Option AllScope -Force
+Set-Alias -Name 'grd' -Value _alias_grd -Option AllScope -Force
+
+# Display the dependency tree for debugging library conflicts
+Set-Alias -Name 'grdt' -Value _alias_grd -Option AllScope -Force
 
 # Gradle Properties - displays the project's resolved properties
 # (the closest Gradle counterpart of Maven's effective POM).
@@ -110,12 +116,12 @@ function _alias_gstop {
 Set-Alias -Name 'gstop' -Value _alias_gstop -Option AllScope -Force
 
 # Open: Gradle Plugin Portal
-function _alias_gpp {
+function _alias_grpp {
   if (-not (_YaffaReq 'file' 'gradlew' 'No gradlew — run from a Gradle project root (with the Gradle wrapper)' '' '' 'abort')) { return }
   if (-not (_YaffaReq 'cmd' 'python' 'python not on PATH — install Python first' '' '' 'abort')) { return }
-  _YaffaCall 'gpp' 'python -m webbrowser https://plugins.gradle.org/' 'Open: Gradle Plugin Portal' @args
+  _YaffaCall 'grpp' 'python -m webbrowser https://plugins.gradle.org/' 'Open: Gradle Plugin Portal' @args
 }
-Set-Alias -Name 'gpp' -Value _alias_gpp -Option AllScope -Force
+Set-Alias -Name 'grpp' -Value _alias_grpp -Option AllScope -Force
 
 # Open: Gradle Plugin Portal
-Set-Alias -Name 'gpps' -Value _alias_gpp -Option AllScope -Force
+Set-Alias -Name 'gpps' -Value _alias_grpp -Option AllScope -Force

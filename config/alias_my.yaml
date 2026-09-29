@@ -5,6 +5,15 @@ title: My - My own aliases
 # replaces it. You can splice the project's requirements (e.g. req_python).
 
 aliases:
+  - name: a4g
+    description: Show all git related aliases (pretty)
+    command:
+      bash: alias-match git | pretty_aliases
+
+  - name: a4g-
+    description: Show all NONE git related aliases (pretty)
+    command:
+      bash: alias-match - git | pretty_aliases
 
   - name: mrep
     command: python -m webbrowser https://search.maven.org/

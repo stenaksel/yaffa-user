@@ -48,9 +48,6 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 |---|---|---|
 | `..` | `cd ..` | Go up one level |
 | `...` | `cd ../..` | Go up two levels |
-| `a4g` | `` | Show all git related aliases |
-| `a4g-` | `` | Show all NONE git related aliases |
-| `pretty_aliases` | `` | Pipe a listing of an alias command into this command and it will pretty-prints it's output |
 | `c` | `clear` | Clear the terminal screen |
 | `env_` | `Get-ChildItem Env: \| Sort-Object Name` | Display environment variables as a sorted table |
 | `hist` | `histfind` | Display command history |
@@ -64,6 +61,8 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 
 | Alias | Command | Description |
 |---|---|---|
+| `a4g` | `` | Show all git related aliases (pretty) |
+| `a4g-` | `` | Show all NONE git related aliases (pretty) |
 | `ga` | `git add` | Short alias for git add |
 | `gbra` | `git branch -a` | Show all branches, both local and remote |
 | `branches` | `git branch -a` | Show all branches, both local and remote |
@@ -73,12 +72,14 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 | `glg` | `git log --pretty=format:'%C(red)%h%Creset -%C(yell…` | Detailed decorated git log with author and relative date |
 | `gp` | `git push` | Short alias for git push |
 | `gs` | `git status` | Displays the current state of your Git working directory and staging area |
+| `gss` | `git status -sb` | Displays in short form the current state of your Git working directory and staging area |
 | `gd` | `git diff` | Changes in the working tree not yet staged for the next commit |
 | `gdh` | `git diff HEAD` | Show all changes since the last commit (staged and unstaged combined) |
 | `gds` | `git diff --staged` | Show staged changes (difference between the index and the last commit) — what would be committed |
 | `gdc` | `git diff --staged` | Show staged changes (difference between the index and the last commit) — what would be committed |
 | `gdss` | `git diff --staged --stat` | Show the total amount of additions or deletions |
 | `gco` | `git checkout` | Switch branches or restore working tree files |
+| `gcob` | `git checkout -b` | Create and switch to a new branch |
 | `gcb` | `git checkout -b` | Create and switch to a new branch |
 | `gb` | `git branch` | List, create, or delete branches |
 | `gba` | `git branch -a` | List all branches, including remotes |
@@ -99,14 +100,16 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 
 | Alias | Command | Description |
 |---|---|---|
-| `gw` | `./gradlew` | Run the Gradle wrapper with the given tasks/options (e.g. 'gw run') |
-| `gci` | `./gradlew clean build publishToMavenLocal` | Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin) |
-| `gcist` | `./gradlew clean build publishToMavenLocal -x test` | Fast project build skipping test execution |
-| `gcp` | `./gradlew clean build` | Package the project (e.g. JAR) without installing to local repository |
-| `gcu-d` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
-| `gcu` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
-| `gddu` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
-| `gdt` | `./gradlew dependencies` | Display the dependency tree for debugging library conflicts |
+| `gr` | `./gradlew` | Run the Gradle wrapper with the given tasks/options (e.g. 'gr run') |
+| `grci` | `./gradlew clean build publishToMavenLocal` | "Clean Install" - Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin) |
+| `grci-` | `./gradlew clean build publishToMavenLocal -x test` | "Clean Install (no tests)" - Fast project build skipping test execution |
+| `grcb` | `./gradlew clean build` | "clean build" - Package the project (e.g. JAR) without installing to local repository |
+| `grp` | `./gradlew clean build` | "clean build" - Package the project (e.g. JAR) without installing to local repository |
+| `grcu-d` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
+| `grcu` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
+| `grddu` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
+| `grd` | `./gradlew dependencies` | Display the dependency tree for debugging library conflicts |
+| `grdt` | `./gradlew dependencies` | Display the dependency tree for debugging library conflicts |
 | `gprops` | `./gradlew properties` | Gradle Properties - displays the project's resolved properties |
 |  |  | (the closest Gradle counterpart of Maven's effective POM). |
 |  |  | (==> Use alias 'gpropss' to save it to the temp directory) |
@@ -115,7 +118,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 | `gtasks` | `./gradlew tasks` | List the tasks available in this project |
 | `gbe` | `./gradlew buildEnvironment` | Display the build script classpath (plugins and their versions) |
 | `gstop` | `./gradlew --stop` | Stop all running Gradle daemons |
-| `gpp` | `python -m webbrowser https://plugins.gradle.org/` | Open: Gradle Plugin Portal |
+| `grpp` | `python -m webbrowser https://plugins.gradle.org/` | Open: Gradle Plugin Portal |
 | `gpps` | `python -m webbrowser https://plugins.gradle.org/` | Open: Gradle Plugin Portal |
 
 ### Kubernetes (`alias_k8s.ps1`)

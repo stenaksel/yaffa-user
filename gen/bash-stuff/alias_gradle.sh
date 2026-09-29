@@ -14,53 +14,59 @@ _alias_req_gtemp_dir() {
 }
 alias req_gtemp_dir='_alias_req_gtemp_dir'
 
-# Run the Gradle wrapper with the given tasks/options (e.g. 'gw run')
-_alias_gw() {
+# Run the Gradle wrapper with the given tasks/options (e.g. 'gr run')
+_alias_gr() {
   _YaffaReq file "gradlew" "No gradlew — run from a Gradle project root (with the Gradle wrapper)" "" "" abort || return 1
-  _YaffaCall gw './gradlew' 'Run the Gradle wrapper with the given tasks/options (e.g. '\''gw run'\'')' "$@"
+  _YaffaCall gr './gradlew' 'Run the Gradle wrapper with the given tasks/options (e.g. '\''gr run'\'')' "$@"
 }
-alias gw='_alias_gw'
+alias gr='_alias_gr'
 
-# Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin)
-_alias_gci() {
+# "Clean Install" - Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin)
+_alias_grci() {
   _YaffaReq file "gradlew" "No gradlew — run from a Gradle project root (with the Gradle wrapper)" "" "" abort || return 1
-  _YaffaCall gci './gradlew clean build publishToMavenLocal' 'Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin)' "$@"
+  _YaffaCall grci './gradlew clean build publishToMavenLocal' '"Clean Install" - Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin)' "$@"
 }
-alias gci='_alias_gci'
+alias grci='_alias_grci'
 
-# Fast project build skipping test execution
-_alias_gcist() {
+# "Clean Install (no tests)" - Fast project build skipping test execution
+_alias_grci-() {
   _YaffaReq file "gradlew" "No gradlew — run from a Gradle project root (with the Gradle wrapper)" "" "" abort || return 1
-  _YaffaCall gcist './gradlew clean build publishToMavenLocal -x test' 'Fast project build skipping test execution' "$@"
+  _YaffaCall grci- './gradlew clean build publishToMavenLocal -x test' '"Clean Install (no tests)" - Fast project build skipping test execution' "$@"
 }
-alias gcist='_alias_gcist'
+alias grci-='_alias_grci-'
 
-# Package the project (e.g. JAR) without installing to local repository
-_alias_gcp() {
+# "clean build" - Package the project (e.g. JAR) without installing to local repository
+_alias_grcb() {
   _YaffaReq file "gradlew" "No gradlew — run from a Gradle project root (with the Gradle wrapper)" "" "" abort || return 1
-  _YaffaCall gcp './gradlew clean build' 'Package the project (e.g. JAR) without installing to local repository' "$@"
+  _YaffaCall grcb './gradlew clean build' '"clean build" - Package the project (e.g. JAR) without installing to local repository' "$@"
 }
-alias gcp='_alias_gcp'
+alias grcb='_alias_grcb'
+
+# "clean build" - Package the project (e.g. JAR) without installing to local repository
+alias grp='_alias_grcb'
 
 # Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)
-_alias_gcu-d() {
+_alias_grcu-d() {
   _YaffaReq file "gradlew" "No gradlew — run from a Gradle project root (with the Gradle wrapper)" "" "" abort || return 1
-  _YaffaCall gcu-d './gradlew dependencyUpdates' 'Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)' "$@"
+  _YaffaCall grcu-d './gradlew dependencyUpdates' 'Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)' "$@"
 }
-alias gcu-d='_alias_gcu-d'
+alias grcu-d='_alias_grcu-d'
 
 # Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)
-alias gcu='_alias_gcu-d'
+alias grcu='_alias_grcu-d'
 
 # Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin)
-alias gddu='_alias_gcu-d'
+alias grddu='_alias_grcu-d'
 
 # Display the dependency tree for debugging library conflicts
-_alias_gdt() {
+_alias_grd() {
   _YaffaReq file "gradlew" "No gradlew — run from a Gradle project root (with the Gradle wrapper)" "" "" abort || return 1
-  _YaffaCall gdt './gradlew dependencies' 'Display the dependency tree for debugging library conflicts' "$@"
+  _YaffaCall grd './gradlew dependencies' 'Display the dependency tree for debugging library conflicts' "$@"
 }
-alias gdt='_alias_gdt'
+alias grd='_alias_grd'
+
+# Display the dependency tree for debugging library conflicts
+alias grdt='_alias_grd'
 
 # Gradle Properties - displays the project's resolved properties
 # (the closest Gradle counterpart of Maven's effective POM).
@@ -111,12 +117,12 @@ _alias_gstop() {
 alias gstop='_alias_gstop'
 
 # Open: Gradle Plugin Portal
-_alias_gpp() {
+_alias_grpp() {
   _YaffaReq file "gradlew" "No gradlew — run from a Gradle project root (with the Gradle wrapper)" "" "" abort || return 1
   _YaffaReq cmd "python" "python not on PATH — install Python first" "" "" abort || return 1
-  _YaffaCall gpp 'python -m webbrowser https://plugins.gradle.org/' 'Open: Gradle Plugin Portal' "$@"
+  _YaffaCall grpp 'python -m webbrowser https://plugins.gradle.org/' 'Open: Gradle Plugin Portal' "$@"
 }
-alias gpp='_alias_gpp'
+alias grpp='_alias_grpp'
 
 # Open: Gradle Plugin Portal
-alias gpps='_alias_gpp'
+alias gpps='_alias_grpp'

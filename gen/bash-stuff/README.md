@@ -28,9 +28,6 @@ source "${YAFFA_GEN}/func/incl.sh"
 |---|---|---|
 | `..` | `cd ..` | Go up one level |
 | `...` | `cd ../..` | Go up two levels |
-| `a4g` | `alias-match git \| awk -F'[ =]' '{gsub(/^'\''\|'\''$…` | Show all git related aliases |
-| `a4g-` | `alias-match - git \| awk -F'[ =]' '{gsub(/^'\''\|'\'…` | Show all NONE git related aliases |
-| `pretty_aliases` | `awk -F'[ =]' '{gsub(/^'\''\|'\''$/, "", $3); printf…` | Pipe a listing of an alias command into this command and it will pretty-prints it's output |
 | `c` | `clear` | Clear the terminal screen |
 | `env_` | `while IFS="=" read -r key value; do printf "%-40s>…` | Display environment variables as a sorted table |
 | `hist` | `history` | Display command history |
@@ -44,6 +41,8 @@ source "${YAFFA_GEN}/func/incl.sh"
 
 | Alias | Command | Description |
 |---|---|---|
+| `a4g` | `alias-match git \| pretty_aliases` | Show all git related aliases (pretty) |
+| `a4g-` | `alias-match - git \| pretty_aliases` | Show all NONE git related aliases (pretty) |
 | `ga` | `git add` | Short alias for git add |
 | `gbra` | `git branch -a` | Show all branches, both local and remote |
 | `branches` | `git branch -a` | Show all branches, both local and remote |
@@ -53,12 +52,14 @@ source "${YAFFA_GEN}/func/incl.sh"
 | `glg` | `git log --pretty=format:'%C(red)%h%Creset -%C(yell…` | Detailed decorated git log with author and relative date |
 | `gp` | `git push` | Short alias for git push |
 | `gs` | `git status` | Displays the current state of your Git working directory and staging area |
+| `gss` | `git status -sb` | Displays in short form the current state of your Git working directory and staging area |
 | `gd` | `git diff` | Changes in the working tree not yet staged for the next commit |
 | `gdh` | `git diff HEAD` | Show all changes since the last commit (staged and unstaged combined) |
 | `gds` | `git diff --staged` | Show staged changes (difference between the index and the last commit) — what would be committed |
 | `gdc` | `git diff --staged` | Show staged changes (difference between the index and the last commit) — what would be committed |
 | `gdss` | `git diff --staged --stat` | Show the total amount of additions or deletions |
 | `gco` | `git checkout` | Switch branches or restore working tree files |
+| `gcob` | `git checkout -b` | Create and switch to a new branch |
 | `gcb` | `git checkout -b` | Create and switch to a new branch |
 | `gb` | `git branch` | List, create, or delete branches |
 | `gba` | `git branch -a` | List all branches, including remotes |
@@ -79,14 +80,16 @@ source "${YAFFA_GEN}/func/incl.sh"
 
 | Alias | Command | Description |
 |---|---|---|
-| `gw` | `./gradlew` | Run the Gradle wrapper with the given tasks/options (e.g. 'gw run') |
-| `gci` | `./gradlew clean build publishToMavenLocal` | Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin) |
-| `gcist` | `./gradlew clean build publishToMavenLocal -x test` | Fast project build skipping test execution |
-| `gcp` | `./gradlew clean build` | Package the project (e.g. JAR) without installing to local repository |
-| `gcu-d` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
-| `gcu` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
-| `gddu` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
-| `gdt` | `./gradlew dependencies` | Display the dependency tree for debugging library conflicts |
+| `gr` | `./gradlew` | Run the Gradle wrapper with the given tasks/options (e.g. 'gr run') |
+| `grci` | `./gradlew clean build publishToMavenLocal` | "Clean Install" - Standard project build with clean, compile, test, and local (Maven) install (maven-publish plugin) |
+| `grci-` | `./gradlew clean build publishToMavenLocal -x test` | "Clean Install (no tests)" - Fast project build skipping test execution |
+| `grcb` | `./gradlew clean build` | "clean build" - Package the project (e.g. JAR) without installing to local repository |
+| `grp` | `./gradlew clean build` | "clean build" - Package the project (e.g. JAR) without installing to local repository |
+| `grcu-d` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
+| `grcu` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
+| `grddu` | `./gradlew dependencyUpdates` | Gradle Check Updates - Dependencies and plugins (ben-manes versions plugin) |
+| `grd` | `./gradlew dependencies` | Display the dependency tree for debugging library conflicts |
+| `grdt` | `./gradlew dependencies` | Display the dependency tree for debugging library conflicts |
 | `gprops` | `./gradlew properties` | Gradle Properties - displays the project's resolved properties |
 |  |  | (the closest Gradle counterpart of Maven's effective POM). |
 |  |  | (==> Use alias 'gpropss' to save it to the temp directory) |
@@ -95,7 +98,7 @@ source "${YAFFA_GEN}/func/incl.sh"
 | `gtasks` | `./gradlew tasks` | List the tasks available in this project |
 | `gbe` | `./gradlew buildEnvironment` | Display the build script classpath (plugins and their versions) |
 | `gstop` | `./gradlew --stop` | Stop all running Gradle daemons |
-| `gpp` | `python -m webbrowser https://plugins.gradle.org/` | Open: Gradle Plugin Portal |
+| `grpp` | `python -m webbrowser https://plugins.gradle.org/` | Open: Gradle Plugin Portal |
 | `gpps` | `python -m webbrowser https://plugins.gradle.org/` | Open: Gradle Plugin Portal |
 
 ### Kubernetes (`alias_k8s.sh`)
@@ -228,3 +231,6 @@ source "${YAFFA_GEN}/func/incl.sh"
 | `_YaffaReqTest <type> <target>` | `type` — Requirement type: file \| dir \| cmd \| env \| expr, `target` — What to check: a file or dir path, a command name, an environment variable name, or an expression | Check a single precondition: return 0 if met, 1 if not, 2 if the requirement type is malformed |
 | `_YaffaReq <type> <target> <fail_msg> <fix_run> <fix_msg> <fix_on_fail>` | `type` — Requirement type: file \| dir \| cmd \| env \| expr (see _YaffaReqTest), `target` — What to check (see _YaffaReqTest), `fail_msg` — Error text shown when the requirement is unmet, `fix_run` — Optional command run to fix an unmet requirement before giving up, `fix_msg` — Optional text shown while running fix_run (default: "Fixing: <target>"), `fix_on_fail` — What to do if the fix doesn't help: abort (default) or warn and continue | Evaluate a precondition and apply an optional fix, reporting the outcome |
 | `alias-match <pattern> <-> <-n> <-->` | `pattern` — Pattern to grep for; whichever argument isn't a recognized option, `-` — Invert the match (exclude aliases matching pattern); also: --invert, -inv, `-n` — Include line numbers in the output, `--` — End of options, so a pattern starting with '-' can still be passed | List defined aliases whose name/target match a pattern (via `alias \| grep`) |
+| `pretty_aliases` | — | A function usable for showing pretty-prints output from a alias command,by piping into this command (alias \| pretty_aliases) |
+| `greet_person <names>` | `names` — One or more names to greet | Print a greeting message |
+| `greet_yaffa <names>` | `names` — One or more names to greet | Print a greeting message |

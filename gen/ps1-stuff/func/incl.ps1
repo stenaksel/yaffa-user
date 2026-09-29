@@ -13,6 +13,16 @@ else
 {
     Split-Path -Parent $_wsFunc
 }
+# The user folder whose config/func/ps1/ functions are dot-sourced last (below)
+# — the same default as the generators.
+$_wsUser = if ($env:YAFFA_USER_FOLDER)
+{
+    $env:YAFFA_USER_FOLDER
+}
+else
+{
+    Join-Path $HOME '.yaffa'
+}
 
 # "name => cmd" steps of an alias chain not printed yet (see _YaffaCall)
 $global:_YaffaSteps = @()
@@ -30,6 +40,7 @@ if (-not $env:YAFFA_INCL)
 }
 Write-Host "   _wsRoot = `"$_wsRoot`""
 Write-Host "   _wsFunc = `"$_wsFunc`""
+Write-Host "   _wsUser = `"$_wsUser`""
 Write-Host "   `$PROFILE = `"$PROFILE`""
 Write-Host ""
 
@@ -264,17 +275,17 @@ else
 
 foreach ($_wsF in (Get-ChildItem -Path $_wsFunc -Filter '*.ps1' -File -ErrorAction SilentlyContinue))
 {
-    if ($_wsF.FullName -ne $PSCommandPath -and $_wsF.Name -ne 'user.ps1')
+    if ($_wsF.FullName -ne $PSCommandPath)
     {
         . $_wsF.FullName
     }
 }
-# The user's own functions (generated from their user folder's config/func/ps1/)
-# are dot-sourced last, so a function they redefine wins over the project's.
-$_wsF = Join-Path $_wsFunc 'user.ps1'
-if (Test-Path -LiteralPath $_wsF)
+# The user's own functions, straight from their user folder's config/func/ps1/
+# (not generated), are dot-sourced last, so a function they redefine wins over
+# the project's. No such folder loads nothing.
+foreach ($_wsF in (Get-ChildItem -Path (Join-Path $_wsUser 'config/func/ps1') -Filter '*.ps1' -File -ErrorAction SilentlyContinue | Sort-Object Name))
 {
-    . $_wsF
+    . $_wsF.FullName
 }
 
-Remove-Variable _wsFunc, _wsRoot, _wsG, _wsF -ErrorAction SilentlyContinue
+Remove-Variable _wsFunc, _wsRoot, _wsUser, _wsG, _wsF -ErrorAction SilentlyContinue

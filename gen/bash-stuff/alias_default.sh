@@ -8,15 +8,6 @@ alias ..='_YaffaCall .. '\''cd ..'\'' '\''Go up one level'\'''
 # Go up two levels
 alias ...='_YaffaCall ... '\''cd ../..'\'' '\''Go up two levels'\'''
 
-# Show all git related aliases
-alias a4g='_YaffaCall a4g '\''alias-match git | pretty_aliases'\'' '\''Show all git related aliases'\'''
-
-# Show all NONE git related aliases
-alias a4g-='_YaffaCall a4g- '\''alias-match - git | pretty_aliases'\'' '\''Show all NONE git related aliases'\'''
-
-# Pipe a listing of an alias command into this command and it will pretty-prints it's output
-alias pretty_aliases='_YaffaCall pretty_aliases '\''awk -F'\''\'\'''\''[ =]'\''\'\'''\'' '\''\'\'''\''{gsub(/^'\''\'\'''\''\'\''\'\'''\'''\''\'\'''\''|'\''\'\'''\''\'\''\'\'''\'''\''\'\'''\''$/, "", $3); printf "%-20s %s\n", $2, substr($0, index($0,$3))}'\''\'\'''\'''\'' '\''Pipe a listing of an alias command into this command and it will pretty-prints it'\''\'\'''\''s output'\'''
-
 # Clear the terminal screen
 alias c='_YaffaCall c '\''clear'\'' '\''Clear the terminal screen'\'''
 
