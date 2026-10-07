@@ -25,9 +25,9 @@ If you've never set one up before:
    ```
 3. Paste these three lines at the end of the file, then save and close Notepad:
    ```powershell
-   $env:YAFFA_GEN = "$HOME\.yaffa\gen\ps1-stuff"
+   $env:YAFFA_USER_FOLDER = "$HOME\.yaffa"   # your user folder
    $env:YAFFA_INCL = 'git, kt, mvn, my'   # optional; omit to load all groups
-   . "$env:YAFFA_GEN\func\incl.ps1"
+   . "$env:YAFFA_USER_FOLDER\gen\ps1-stuff\func\incl.ps1"
    ```
 4. Load it in your current window with `. $PROFILE`, or just open a new
    PowerShell window — either way, it'll run automatically every time from now on.
@@ -57,39 +57,53 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 | `shell_` | `(Get-Process -Id $PID).MainModule.FileVersionInfo.…` | Display shell version information |
 | `term_` | `(Get-Process -Id $PID).MainModule.FileVersionInfo.…` | Display shell version information |
 
+### Docker aliases (`alias_docker.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `drmf` | `docker container rm -f` | Force the removal of a running container (uses SIGKILL) |
+| `dclft` | `docker compose logs -f --tail 0` | Follow only new log output (no history) |
+
+### GitHub CLI aliases (`alias_gh.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `ghst` | `gh status` | Show your assigned issues, review requests, mentions and notifications across repositories |
+| `ghb` | `gh browse` | Open the current repository (or a file, issue or PR number) in the browser |
+| `ghrv` | `gh repo view` | Show the current repository's description and README (--web to open it) |
+| `ghrc` | `gh repo clone` | Clone a GitHub repository (e.g. 'ghrc owner/repo') |
+| `ghprl` | `gh pr list` | List the open pull requests in the current repository |
+| `ghprs` | `gh pr status` | Show the status of your pull requests and the current branch's |
+| `ghprv` | `gh pr view` | Show the current branch's pull request (or one by number) |
+| `ghprw` | `gh pr view --web` | Open the current branch's pull request (or one by number) in the browser |
+| `ghprc` | `gh pr create` | Create a pull request for the current branch |
+| `ghprcf` | `gh pr create --fill` | Create a pull request, taking the title and body from the commits |
+| `ghprco` | `gh pr checkout` | Check out a pull request's branch locally (e.g. 'ghprco 42') |
+| `ghprd` | `gh pr diff` | Show the changes in the current branch's pull request (or one by number) |
+| `ghprk` | `gh pr checks` | Show the CI check results of the current branch's pull request |
+| `ghprm` | `gh pr merge` | Merge the current branch's pull request (or one by number) |
+| `ghil` | `gh issue list` | List the open issues in the current repository |
+| `ghiv` | `gh issue view` | Show an issue (e.g. 'ghiv 42') |
+| `ghic` | `gh issue create` | Create an issue |
+| `ghrunl` | `gh run list` | List recent GitHub Actions workflow runs |
+| `ghrunv` | `gh run view` | Show a workflow run's summary (--log for its log) |
+| `ghrunw` | `gh run watch` | Watch a workflow run until it finishes |
+
 ### Git aliases (`alias_git.ps1`)
 
 | Alias | Command | Description |
 |---|---|---|
 | `a4g` | `` | Show all git related aliases (pretty) |
 | `a4g-` | `` | Show all NONE git related aliases (pretty) |
-| `ga` | `git add` | Short alias for git add |
-| `gbra` | `git branch -a` | Show all branches, both local and remote |
-| `branches` | `git branch -a` | Show all branches, both local and remote |
-| `gbr` | `git branch -a` | Show all branches, both local and remote |
 | `gc` | `git commit` | Short alias for git commit |
-| `gl` | `git log --oneline --graph --decorate` | Compact decorated git log |
-| `glg` | `git log --pretty=format:'%C(red)%h%Creset -%C(yell…` | Detailed decorated git log with author and relative date |
-| `gp` | `git push` | Short alias for git push |
+| `glg` | `git log --pretty=format:'%C(red)%h%Creset -%C(yell…` | Detailed decorated git log with author and relative date (Use 'Q' to quit listing th log) |
 | `gs` | `git status` | Displays the current state of your Git working directory and staging area |
 | `gss` | `git status -sb` | Displays in short form the current state of your Git working directory and staging area |
-| `gd` | `git diff` | Changes in the working tree not yet staged for the next commit |
 | `gdh` | `git diff HEAD` | Show all changes since the last commit (staged and unstaged combined) |
-| `gds` | `git diff --staged` | Show staged changes (difference between the index and the last commit) — what would be committed |
 | `gdc` | `git diff --staged` | Show staged changes (difference between the index and the last commit) — what would be committed |
 | `gdss` | `git diff --staged --stat` | Show the total amount of additions or deletions |
-| `gco` | `git checkout` | Switch branches or restore working tree files |
 | `gcob` | `git checkout -b` | Create and switch to a new branch |
-| `gcb` | `git checkout -b` | Create and switch to a new branch |
-| `gb` | `git branch` | List, create, or delete branches |
-| `gba` | `git branch -a` | List all branches, including remotes |
-| `gf` | `git fetch --all --prune` | Fetch from all remotes and remove stale remote-tracking refs |
-| `gpl` | `git pull` | Fetch and integrate changes from the remote branch |
-| `gm` | `git merge` | Merge a branch into the current branch |
-| `grb` | `git rebase` | Reapply commits on top of another base tip |
-| `grbi` | `git rebase -i` | Interactive rebase |
 | `gst` | `git stash` | Stash uncommitted changes |
-| `gstp` | `git stash pop` | Re-apply and remove the most recent stash |
 | `gcm` | `git commit -m` | Commit with an inline message |
 | `gca` | `git commit --amend` | Amend the most recent commit |
 | `glast` | `git log -1 HEAD` | Show the most recent commit |
@@ -121,26 +135,24 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 | `grpp` | `python -m webbrowser https://plugins.gradle.org/` | Open: Gradle Plugin Portal |
 | `gpps` | `python -m webbrowser https://plugins.gradle.org/` | Open: Gradle Plugin Portal |
 
+### Helm aliases (`alias_helm.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `hls` | `helm list` | List the releases in the current namespace |
+| `hst` | `helm status` | Show the status of a release |
+| `hrb` | `helm rollback` | Roll a release back to a previous revision (e.g. 'hrb my-app 2') |
+| `hrepu` | `helm repo update` | Update the information on available charts from the chart repositories |
+
 ### Kubernetes (`alias_k8s.ps1`)
 
 | Alias | Command | Description |
 |---|---|---|
-| `k` | `kubectl` | Short alias for kubectl |
 | `kg` | `kubectl get` | Get one or more resources (e.g. 'kg pods') |
-| `kgp` | `kubectl get pods` | List pods in the current namespace |
-| `kgpa` | `kubectl get pods --all-namespaces` | List pods across all namespaces |
 | `kgpw` | `kubectl get pods -o wide` | List pods with extra detail (node, IP) |
-| `kgs` | `kubectl get svc` | List services in the current namespace |
-| `kgd` | `kubectl get deployments` | List deployments in the current namespace |
 | `kgn` | `kubectl get nodes` | List cluster nodes |
-| `kga` | `kubectl get all` | List all common resources in the current namespace |
 | `kd` | `kubectl describe` | Show detailed state of a resource (e.g. 'kd pod my-pod') |
-| `kdp` | `kubectl describe pod` | Show detailed state of a pod |
-| `kl` | `kubectl logs` | Show logs for a pod |
-| `klf` | `kubectl logs -f` | Follow (stream) logs for a pod |
 | `kex` | `kubectl exec -it` | Open an interactive shell/command in a pod (e.g. 'kex my-pod -- sh') |
-| `kaf` | `kubectl apply -f` | Apply a manifest file or directory |
-| `kdel` | `kubectl delete` | Delete a resource — irreversible (e.g. 'kdel pod my-pod') |
 | `kctx` | `kubectl config get-contexts` | List available kubeconfig contexts |
 | `kuc` | `kubectl config use-context` | Switch the active kubeconfig context |
 | `kns` | `kubectl config set-context --current --namespace` | Switch the active namespace for the current context |
@@ -149,7 +161,6 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 | `krr` | `kubectl rollout restart` | Restart a deployment/statefulset (e.g. 'krr deployment my-app') |
 | `kcsc` | `kubectl scale` | Scale a resource (e.g. 'kcsc deployment my-app --replicas=3') |
 | `ksc` | `kubectl config set-context` | Create or modify a kubeconfig context entry |
-| `kpf` | `kubectl port-forward` | Forward a local port to a pod/service (e.g. 'kpf pod/my-pod 8080:80') |
 | `kev` | `kubectl get events --sort-by=.metadata.creationTim…` | List cluster events, oldest first |
 
 ### Kotlin aliases (`alias_kt.ps1`)
@@ -188,6 +199,341 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 | `meps` | `mvn help:effective-pom > temp/effective-pom.xml` | Maven Effective-Pom Save - Saves the effective POM to temp/effective-pom.xml |
 | `mvnt` | `mvn test` | Run unit tests only |
 
+### npm aliases (`alias_npm.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `nci` | `npm ci` | "Clean Install" - Install exactly the dependencies in package-lock.json, removing node_modules first |
+| `ncp` | `npm pack` | Package the project into a tarball (.tgz) without publishing it |
+| `ncu-d` | `npm outdated` | npm Check Updates - list installed packages with newer versions available |
+| `npmo` | `npm outdated` | npm Check Updates - list installed packages with newer versions available |
+| `nddu` | `npm outdated` | npm Check Updates - list installed packages with newer versions available |
+| `npmis` | `npm i -S` | Install packages and save them to dependencies in package.json |
+| `npmid` | `npm i -D` | Install packages and save them to devDependencies in package.json |
+| `npmif` | `npm i -f` | Install, forcing npm to fetch remote resources even if a local copy exists on disk |
+| `npmu` | `npm update` | Update the installed packages to the latest versions their ranges allow |
+| `npmr` | `npm run` | Run a script from package.json (e.g. 'npmr lint'; without a name, lists them) |
+| `npml` | `npm list` | List the installed packages |
+| `npml0` | `npm ls --depth=0` | List the top-level installed packages only |
+| `npmse` | `npm search` | Search the registry for packages |
+| `npmv` | `npm -v` | Show the npm version |
+| `npminit` | `npm init` | Create a package.json for a new project |
+| `npmp` | `npm publish` | Publish the package to the registry |
+
+### Docker Compose aliases (Oh My Zsh) (`alias_omz_docker-compose.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `dco` | `docker compose` | Docker Compose main command (e.g. 'dco ls') |
+| `dcup` | `docker compose up` | Build, (re)create, start, and attach to containers for a service |
+| `dcupd` | `docker compose up -d` | Same as 'dcup', but detached (in the background) |
+| `dcupb` | `docker compose up --build` | Same as 'dcup', but build images before starting containers |
+| `dcupdb` | `docker compose up -d --build` | Same as 'dcup', but build images before starting containers, detached |
+| `dcdn` | `docker compose down` | Stop and remove the containers and networks of the project |
+| `dcb` | `docker compose build` | Build or rebuild the services' images |
+| `dcc` | `docker compose config` | Parse, resolve and render the compose file in canonical format |
+| `dce` | `docker compose exec` | Execute a command inside a running service container |
+| `dcr` | `docker compose run` | Run a one-off command in a new service container |
+| `dcps` | `docker compose ps` | List the project's containers |
+| `dci` | `docker compose images` | List the images used by the project's containers |
+| `dcl` | `docker compose logs` | Show the logs of the project's containers |
+| `dclf` | `docker compose logs -f` | Show the logs and follow the output |
+| `dcstart` | `docker compose start` | Start existing service containers |
+| `dcstop` | `docker compose stop` | Stop running service containers without removing them |
+| `dcrestart` | `docker compose restart` | Restart service containers |
+| `dck` | `docker compose kill` | Force-stop service containers |
+| `dcrm` | `docker compose rm` | Remove stopped service containers |
+| `dcpull` | `docker compose pull` | Pull the services' images |
+| `dcsts` | `docker compose stats` | Display real-time resource usage of the project's containers |
+| `dcv` | `docker compose version` | Show the Docker Compose version |
+
+### Docker aliases (Oh My Zsh) (`alias_omz_docker.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `dbl` | `docker build` | Build an image from a Dockerfile |
+| `dib` | `docker image build` | Build an image from a Dockerfile (same as docker build) |
+| `dii` | `docker image inspect` | Display detailed information on one or more images |
+| `dils` | `docker image ls` | List docker images |
+| `dipu` | `docker image push` | Push an image or repository to a remote registry |
+| `dpu` | `docker pull` | Pull an image or a repository from a registry |
+| `dit` | `docker image tag` | Add a name and tag to a particular image |
+| `dirm` | `docker image rm` | Remove one or more images |
+| `dipru` | `docker image prune -a` | Remove all images not referenced by any container — irreversible |
+| `dps` | `docker ps` | List the running containers |
+| `dpsa` | `docker ps -a` | List all containers, running and stopped |
+| `dcls` | `docker container ls` | List the running containers (same as docker ps) |
+| `dclsa` | `docker container ls -a` | List all containers, running and stopped (same as docker ps -a) |
+| `dcin` | `docker container inspect` | Display detailed information on one or more containers |
+| `dr` | `docker container run` | Create a new container and start it using the specified command |
+| `drit` | `docker container run -it` | Create a new container and start it in an interactive shell |
+| `dxc` | `docker container exec` | Run a new command in a running container |
+| `dxcit` | `docker container exec -it` | Run a new command in a running container in an interactive shell (e.g. 'dxcit my-app sh') |
+| `dlo` | `docker container logs` | Fetch the logs of a container |
+| `dpo` | `docker container port` | List port mappings or a specific mapping for the container |
+| `dst` | `docker container start` | Start one or more stopped containers |
+| `drs` | `docker container restart` | Restart one or more containers |
+| `dstp` | `docker container stop` | Stop one or more running containers |
+| `dsta` | `docker stop (docker ps -q)` | Stop all running containers |
+| `drm` | `docker container rm` | Remove the specified container(s) |
+| `dcprune` | `docker container prune` | Remove all stopped containers — irreversible |
+| `dsts` | `docker stats` | Display real-time streaming statistics for containers |
+| `dtop` | `docker top` | Display the running processes of a container |
+| `dnls` | `docker network ls` | List all networks the engine daemon knows about |
+| `dni` | `docker network inspect` | Return information about one or more networks |
+| `dnc` | `docker network create` | Create a new network |
+| `dncn` | `docker network connect` | Connect a container to a network |
+| `dndcn` | `docker network disconnect` | Disconnect a container from a network |
+| `dnrm` | `docker network rm` | Remove one or more networks |
+| `dnprune` | `docker network prune` | Remove all unused networks |
+| `dvls` | `docker volume ls` | List all the volumes known to docker |
+| `dvi` | `docker volume inspect` | Display detailed information about one or more volumes |
+| `dvprune` | `docker volume prune` | Remove all unused local volumes — irreversible |
+| `dsprune` | `docker system prune` | Remove all unused containers, networks and dangling images — irreversible |
+
+### Git aliases (Oh My Zsh) (`alias_omz_git.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `g` | `git` | Short alias for git |
+| `ga` | `git add` | Short alias for git add |
+| `gaa` | `git add --all` | Stage all changes — new, modified and deleted files |
+| `gapa` | `git add --patch` | Choose interactively which changes (hunks) to stage |
+| `gl` | `git pull` | Short alias for git pull |
+| `glog` | `git log --oneline --decorate --graph` | Compact decorated git log (Use 'Q' to quit listing th log) |
+| `gloga` | `git log --oneline --decorate --graph --all` | Compact decorated git log of all branches (Use 'Q' to quit listing the log) |
+| `gp` | `git push` | Short alias for git push |
+| `gpf` | `git push --force-with-lease --force-if-includes` | Force-push safely — refuses if the remote has commits you haven't fetched and integrated |
+| `gsb` | `git status --short --branch` | Displays in short form the current state of your Git working directory and staging area |
+| `gd` | `git diff` | Changes in the working tree not yet staged for the next commit |
+| `gds` | `git diff --staged` | Show staged changes (difference between the index and the last commit) — what would be committed |
+| `gdca` | `git diff --cached` | Show staged changes (difference between the index and the last commit) — what would be committed |
+| `gco` | `git checkout` | Switch branches or restore working tree files |
+| `gcb` | `git checkout -b` | Create and switch to a new branch |
+| `gsw` | `git switch` | Switch to another branch |
+| `gswc` | `git switch --create` | Create and switch to a new branch (like gcob) |
+| `gb` | `git branch` | List, create, or delete branches |
+| `gba` | `git branch --all` | List all branches, including remotes |
+| `gbd` | `git branch --delete` | Delete a branch (only when it's fully merged) |
+| `gbm` | `git branch --move` | Rename a branch (e.g. 'gbm old-name new-name') |
+| `gpr` | `git pull --rebase` | Pull, rebasing your local commits on top instead of merging |
+| `gpra` | `git pull --rebase --autostash` | Pull with rebase, stashing and re-applying uncommitted changes |
+| `gm` | `git merge` | Merge a branch into the current branch |
+| `gma` | `git merge --abort` | Abort a merge with conflicts, going back to before it started |
+| `grb` | `git rebase` | Reapply commits on top of another base tip |
+| `grbi` | `git rebase --interactive` | Interactive rebase |
+| `grbc` | `git rebase --continue` | Continue a rebase after resolving conflicts |
+| `grba` | `git rebase --abort` | Abort a rebase, going back to before it started |
+| `grbs` | `git rebase --skip` | Skip the current commit and continue the rebase |
+| `gstp` | `git stash pop` | Re-apply and remove the most recent stash |
+| `gstl` | `git stash list` | List the stashes |
+| `gstaa` | `git stash apply` | Re-apply a stash, keeping it in the list |
+| `gstd` | `git stash drop` | Remove a stash from the list — irreversible |
+| `gsh` | `git show` | Show a commit's message and changes (the latest by default) |
+| `grf` | `git reflog` | Show where HEAD has been — to find lost commits |
+| `grev` | `git revert` | Create a new commit undoing an earlier commit's changes |
+| `grs` | `git restore` | Discard changes to files in the working tree — irreversible |
+| `grst` | `git restore --staged` | Unstage files, keeping their changes in the working tree |
+| `gcp` | `git cherry-pick` | Apply the changes of existing commits onto the current branch |
+| `gcpc` | `git cherry-pick --continue` | Continue a cherry-pick after resolving conflicts |
+| `gcpa` | `git cherry-pick --abort` | Abort a cherry-pick, going back to before it started |
+| `gcl` | `git clone --recurse-submodules` | Clone a repository, including its submodules |
+| `gwt` | `git worktree` | Manage extra working trees of this repository |
+| `gwta` | `git worktree add` | Check out a branch in a new working tree (e.g. 'gwta ../fix-1 fix-1') |
+| `gwtls` | `git worktree list` | List the working trees |
+| `gwtrm` | `git worktree remove` | Remove a working tree |
+| `gau` | `git add --update` | Short alias for git add --update |
+| `gav` | `git add --verbose` | Short alias for git add --verbose |
+| `gam` | `git am` | Short alias for git am |
+| `gama` | `git am --abort` | Short alias for git am --abort |
+| `gamc` | `git am --continue` | Short alias for git am --continue |
+| `gamscp` | `git am --show-current-patch` | Short alias for git am --show-current-patch |
+| `gams` | `git am --skip` | Short alias for git am --skip |
+| `gap` | `git apply` | Short alias for git apply |
+| `gapt` | `git apply --3way` | Short alias for git apply --3way |
+| `gbs` | `git bisect` | Short alias for git bisect |
+| `gbsb` | `git bisect bad` | Short alias for git bisect bad |
+| `gbsg` | `git bisect good` | Short alias for git bisect good |
+| `gbsn` | `git bisect new` | Short alias for git bisect new |
+| `gbso` | `git bisect old` | Short alias for git bisect old |
+| `gbsr` | `git bisect reset` | Short alias for git bisect reset |
+| `gbss` | `git bisect start` | Short alias for git bisect start |
+| `gbl` | `git blame -w` | Short alias for git blame -w |
+| `gbgd` | `` | Short alias for LANG=C git branch --no-color -vv \| grep ": gone\]" \| cut -c 3- \| awk '{print $1}' \| xargs git branch -d |
+| `gbnm` | `git branch --no-merged` | Short alias for git branch --no-merged |
+| `gbr` | `git branch --remotes` | Short alias for git branch --remotes |
+| `gbg` | `` | Short alias for LANG=C git branch -vv \| grep ": gone\]" |
+| `gcor` | `git checkout --recurse-submodules` | Short alias for git checkout --recurse-submodules |
+| `gclf` | `git clone --recursive --shallow-submodules --filte…` | Short alias for git clone --recursive --shallow-submodules --filter=blob:none --also-filter-submodules |
+| `gcam` | `git commit --all --message` | Short alias for git commit --all --message |
+| `gcas` | `git commit --all --signoff` | Short alias for git commit --all --signoff |
+| `gcasm` | `git commit --all --signoff --message` | Short alias for git commit --all --signoff --message |
+| `gcs` | `git commit --gpg-sign` | Short alias for git commit --gpg-sign |
+| `gcss` | `git commit --gpg-sign --signoff` | Short alias for git commit --gpg-sign --signoff |
+| `gcssm` | `git commit --gpg-sign --signoff --message` | Short alias for git commit --gpg-sign --signoff --message |
+| `gcmsg` | `git commit --message` | Short alias for git commit --message |
+| `gcsm` | `git commit --signoff --message` | Short alias for git commit --signoff --message |
+| `gcn` | `git commit --verbose --no-edit` | Short alias for git commit --verbose --no-edit |
+| `gcf` | `git config --list` | Short alias for git config --list |
+| `gcfu` | `git commit --fixup` | Short alias for git commit --fixup |
+| `gdcw` | `git diff --cached --word-diff` | Short alias for git diff --cached --word-diff |
+| `gdw` | `git diff --word-diff` | Short alias for git diff --word-diff |
+| `gdup` | `` | Short alias for git diff @{upstream} |
+| `gdt` | `git diff-tree --no-commit-id --name-only -r` | Short alias for git diff-tree --no-commit-id --name-only -r |
+| `gfo` | `git fetch origin` | Short alias for git fetch origin |
+| `gg` | `git gui citool` | Short alias for git gui citool |
+| `gga` | `git gui citool --amend` | Short alias for git gui citool --amend |
+| `ghh` | `git help` | Short alias for git help |
+| `glgg` | `git log --graph` | Short alias for git log --graph |
+| `glgga` | `git log --graph --decorate --all` | Short alias for git log --graph --decorate --all |
+| `glgm` | `git log --graph --max-count=10` | Short alias for git log --graph --max-count=10 |
+| `glods` | `` | Short alias for git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset" --date=short |
+| `glod` | `` | Short alias for git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ad) %C(bold blue)<%an>%Creset" |
+| `glola` | `` | Short alias for git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset" --all |
+| `glols` | `` | Short alias for git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset" --stat |
+| `glol` | `` | Short alias for git log --graph --pretty="%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%ar) %C(bold blue)<%an>%Creset" |
+| `glo` | `git log --oneline --decorate` | Short alias for git log --oneline --decorate |
+| `glgp` | `git log --stat --patch` | Short alias for git log --stat --patch |
+| `gignored` | `` | Short alias for git ls-files -v \| grep "^[[:lower:]]" |
+| `gfg` | `` | Short alias for git ls-files \| grep |
+| `gmc` | `git merge --continue` | Short alias for git merge --continue |
+| `gms` | `git merge --squash` | Short alias for git merge --squash |
+| `gmff` | `git merge --ff-only` | Short alias for git merge --ff-only |
+| `gmtl` | `git mergetool --no-prompt` | Short alias for git mergetool --no-prompt |
+| `gmtlvim` | `git mergetool --no-prompt --tool=vimdiff` | Short alias for git mergetool --no-prompt --tool=vimdiff |
+| `gprv` | `git pull --rebase -v` | Short alias for git pull --rebase -v |
+| `gprav` | `git pull --rebase --autostash -v` | Short alias for git pull --rebase --autostash -v |
+| `gpd` | `git push --dry-run` | Short alias for git push --dry-run |
+| `gpv` | `git push --verbose` | Short alias for git push --verbose |
+| `gpoat` | `` | Short alias for git push origin --all && git push origin --tags |
+| `gpod` | `git push origin --delete` | Short alias for git push origin --delete |
+| `gpu` | `git push upstream` | Short alias for git push upstream |
+| `grbo` | `git rebase --onto` | Short alias for git rebase --onto |
+| `grv` | `git remote --verbose` | Short alias for git remote --verbose |
+| `gra` | `git remote add` | Short alias for git remote add |
+| `grrm` | `git remote remove` | Short alias for git remote remove |
+| `grmv` | `git remote rename` | Short alias for git remote rename |
+| `grset` | `git remote set-url` | Short alias for git remote set-url |
+| `grup` | `git remote update` | Short alias for git remote update |
+| `grh` | `git reset` | Short alias for git reset |
+| `gru` | `git reset --` | Short alias for git reset -- |
+| `grhh` | `git reset --hard` | Short alias for git reset --hard |
+| `grhk` | `git reset --keep` | Short alias for git reset --keep |
+| `grhs` | `git reset --soft` | Short alias for git reset --soft |
+| `gpristine` | `` | Short alias for git reset --hard && git clean --force -dfx |
+| `gwipe` | `` | Short alias for git reset --hard && git clean --force -df |
+| `grss` | `git restore --source` | Short alias for git restore --source |
+| `gunwip` | `` | Short alias for git rev-list --max-count=1 --format="%s" HEAD \| grep -q "\--wip--" && git reset HEAD~1 |
+| `greva` | `git revert --abort` | Short alias for git revert --abort |
+| `grevc` | `git revert --continue` | Short alias for git revert --continue |
+| `grm` | `git rm` | Short alias for git rm |
+| `grmc` | `git rm --cached` | Short alias for git rm --cached |
+| `gcount` | `git shortlog --summary --numbered` | Short alias for git shortlog --summary --numbered |
+| `gsps` | `git show --pretty=short --show-signature` | Short alias for git show --pretty=short --show-signature |
+| `gstall` | `git stash --all` | Short alias for git stash --all |
+| `gstc` | `git stash clear` | Short alias for git stash clear |
+| `gsts` | `git stash show --patch` | Short alias for git stash show --patch |
+| `gsnut` | `git status --untracked-files=no` | Short alias for git status --untracked-files=no |
+| `gsi` | `git submodule init` | Short alias for git submodule init |
+| `gsu` | `git submodule update` | Short alias for git submodule update |
+| `gsuri` | `git submodule update --recursive --init` | Short alias for git submodule update --recursive --init |
+| `gsd` | `git svn dcommit` | Short alias for git svn dcommit |
+| `gsr` | `git svn rebase` | Short alias for git svn rebase |
+| `gta` | `git tag --annotate` | Short alias for git tag --annotate |
+| `gts` | `git tag --sign` | Short alias for git tag --sign |
+| `gtv` | `` | Short alias for git tag \| sort -V |
+| `gignore` | `git update-index --assume-unchanged` | Short alias for git update-index --assume-unchanged |
+| `gunignore` | `git update-index --no-assume-unchanged` | Short alias for git update-index --no-assume-unchanged |
+| `gwch` | `git log --patch --abbrev-commit --pretty=medium --…` | Short alias for git log --patch --abbrev-commit --pretty=medium --raw |
+| `gwtmv` | `git worktree move` | Short alias for git worktree move |
+
+### Helm aliases (Oh My Zsh) (`alias_omz_helm.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `h` | `helm` | Short alias for helm |
+| `hin` | `helm install` | Install a chart as a new release (e.g. 'hin my-app ./chart') |
+| `hup` | `helm upgrade` | Upgrade a release to a new chart version or values (e.g. 'hup my-app ./chart -f values.yaml') |
+| `hun` | `helm uninstall` | Uninstall a release — irreversible |
+| `hse` | `helm search` | Search for charts (e.g. 'hse repo nginx' or 'hse hub nginx') |
+
+### Kubernetes (kubectl) aliases (Oh My Zsh) (`alias_omz_kubectl.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `k` | `kubectl` | Short alias for kubectl |
+| `kgp` | `kubectl get pods` | List pods in the current namespace |
+| `kgpa` | `kubectl get pods --all-namespaces` | List pods across all namespaces |
+| `kgs` | `kubectl get svc` | List services in the current namespace |
+| `kgi` | `kubectl get ingress` | List ingresses in the current namespace |
+| `kgcm` | `kubectl get configmaps` | List configmaps in the current namespace |
+| `kgsec` | `kubectl get secret` | List secrets in the current namespace |
+| `kgd` | `kubectl get deployment` | List deployments in the current namespace |
+| `kgss` | `kubectl get statefulset` | List statefulsets in the current namespace |
+| `kgj` | `kubectl get job` | List jobs in the current namespace |
+| `kgcj` | `kubectl get cronjob` | List cronjobs in the current namespace |
+| `kgpvc` | `kubectl get pvc` | List persistent volume claims in the current namespace |
+| `kgno` | `kubectl get nodes` | List cluster nodes |
+| `kga` | `kubectl get all` | List all common resources in the current namespace |
+| `kgaa` | `kubectl get all --all-namespaces` | List all common resources across all namespaces |
+| `kgns` | `kubectl get namespaces` | List namespaces |
+| `kdp` | `kubectl describe pods` | Show detailed state of a pod |
+| `kdd` | `kubectl describe deployment` | Show detailed state of a deployment |
+| `kl` | `kubectl logs` | Show logs for a pod |
+| `klf` | `kubectl logs -f` | Follow (stream) logs for a pod |
+| `keti` | `kubectl exec -t -i` | Open an interactive shell/command in a pod (e.g. 'kex my-pod -- sh') |
+| `kaf` | `kubectl apply -f` | Apply a manifest file or directory |
+| `kapk` | `kubectl apply -k` | Apply a kustomization directory (e.g. 'kapk overlays/dev') |
+| `kdel` | `kubectl delete` | Delete a resource — irreversible (e.g. 'kdel pod my-pod') |
+| `kdelf` | `kubectl delete -f` | Delete the resources in a manifest file or directory — irreversible |
+| `kcgc` | `kubectl config get-contexts` | List available kubeconfig contexts |
+| `kccc` | `kubectl config current-context` | Show the active kubeconfig context |
+| `kcuc` | `kubectl config use-context` | Switch the active kubeconfig context |
+| `kcn` | `kubectl config set-context --current --namespace` | Switch the active namespace for the current context |
+| `krh` | `kubectl rollout history` | Show the rollout history of a deployment/statefulset (e.g. 'krh deployment my-app') |
+| `kru` | `kubectl rollout undo` | Roll back to the previous revision (e.g. 'kru deployment my-app') |
+| `kpf` | `kubectl port-forward` | Forward a local port to a pod/service (e.g. 'kpf pod/my-pod 8080:80') |
+| `kcp` | `kubectl cp` | Copy files to or from a container (e.g. 'kcp my-pod:/tmp/log.txt ./log.txt') |
+
+### npm aliases (Oh My Zsh) (`alias_omz_npm.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `npmg` | `npm i -g` | Install packages globally (e.g. 'npmg typescript') |
+| `npmst` | `npm start` | Run the project's start script |
+| `npmt` | `npm test` | Run the project's tests |
+| `npmrd` | `npm run dev` | Run the project's dev script |
+| `npmrb` | `npm run build` | Run the project's build script |
+| `npmi` | `npm info` | Show information about a package from the registry (e.g. 'npmi react') |
+
+### Terraform aliases (Oh My Zsh) (`alias_omz_terraform.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `tf` | `terraform` | Short alias for terraform |
+| `tfi` | `terraform init` | Initialize the working directory (providers, modules, backend) |
+| `tfir` | `terraform init -reconfigure` | Initialize, reconfiguring the backend and ignoring any saved configuration |
+| `tfiu` | `terraform init -upgrade` | Initialize, upgrading modules and providers to the newest allowed versions |
+| `tfiur` | `terraform init -upgrade -reconfigure` | Initialize with upgraded modules and providers, reconfiguring the backend |
+| `tff` | `terraform fmt` | Format the configuration files in the current directory |
+| `tffr` | `terraform fmt -recursive` | Format the configuration files in the current directory and its subdirectories |
+| `tfv` | `terraform validate` | Check that the configuration is syntactically valid and internally consistent |
+| `tft` | `terraform test` | Run the module's Terraform tests (*.tftest.hcl) |
+| `tfp` | `terraform plan` | Show the changes that apply would make |
+| `tfpo` | `terraform plan -out tfplan` | Plan and save the plan to the file tfplan (==> apply it with 'tfapp') |
+| `tfa` | `terraform apply` | Plan and apply the changes, after asking for approval |
+| `tfap` | `terraform apply -parallelism=1` | Apply the changes one resource at a time (-parallelism=1) |
+| `tfapp` | `terraform apply tfplan` | Apply the plan saved by 'tfpo' (the file tfplan) |
+| `tfd` | `terraform destroy` | Destroy all managed infrastructure, after asking for approval — irreversible |
+| `tfdp` | `terraform destroy -parallelism=1` | Destroy all managed infrastructure one resource at a time — irreversible |
+| `tfo` | `terraform output` | Show the root module's output values |
+| `tfsh` | `terraform show` | Show the current state or a saved plan |
+| `tfs` | `terraform state` | Advanced state management (e.g. 'tfs list') |
+| `tfc` | `terraform console` | Open an interactive console for evaluating expressions |
+| `tfw` | `terraform workspace` | Manage workspaces (e.g. 'tfw new staging') |
+| `tfwl` | `terraform workspace list` | List the workspaces |
+| `tfws` | `terraform workspace select` | Switch to another workspace (e.g. 'tfws staging') |
+
 ### Python aliases (`alias_py.ps1`)
 
 | Alias | Command | Description |
@@ -210,18 +556,30 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 | `plf` | `python -m ruff format .` | Format your Python sources — needs the 'ruff' package |
 | `pypi` | `python -m webbrowser https://pypi.org/` | Open: Python Package Index (PyPI) |
 
+### Terraform aliases (`alias_terraform.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
+| `tfaay` | `terraform apply -auto-approve` | Apply the changes WITHOUT asking for approval |
+| `tfday` | `terraform destroy -auto-approve` | Destroy all managed infrastructure WITHOUT asking for approval — irreversible |
+
 ### YAFFA - regenerate your aliases (`alias_yaffa.ps1`)
 
 | Alias | Command | Description |
 |---|---|---|
-| `yaffa` | `python ./YAFFA-P/src/generator.py generate` | Regenerate YAFFA - run from YAFFA root to regenerate your shell files (in <user folder>/gen, default ~/.yaffa/gen) |
+| `yaffa` | `python ./YAFFA-P/src/generator.py generate` | Regenerate YAFFA - run from YAFFA root to regenerate your shell files in <user folder>/gen (default ~/.yaffa/gen) |
 |  |  | from the project's config/ and your user folder's config/ (For help use: 'yaffa --help') |
-| `regen-yaffa` | `python ./YAFFA-P/src/generator.py generate` | Regenerate YAFFA - run from YAFFA root to regenerate your shell files (in <user folder>/gen, default ~/.yaffa/gen) |
+| `regen-yaffa` | `python ./YAFFA-P/src/generator.py generate` | Regenerate YAFFA - run from YAFFA root to regenerate your shell files in <user folder>/gen (default ~/.yaffa/gen) |
 |  |  | from the project's config/ and your user folder's config/ (For help use: 'yaffa --help') |
 | `yaffa-p` | `python ./YAFFA-P/src/generator.py generate` | Regenerate YAFFA (with Python) - run from YAFFA root to regenerate your shell files (in <user folder>/gen) |
 |  |  | from the project's config/ and your user folder's config/ (For help use: 'yaffa --help') |
-| `yaffa-k` | `yaffa_k` | Regenerate YAFFA (with Kotlin) - run from YAFFA root to regenerate your bash files (in <user folder>/gen) |
+| `yaffa-k` | `yaffa_k` | Regenerate YAFFA (with Kotlin) - run from YAFFA root to regenerate your shell files (in <user folder>/gen) |
 |  |  | from the project's config/ and your user folder's config/ (For help use: 'yaffa --help') |
+
+### YAFFA - examples (`alias_yaffa_example.ps1`)
+
+| Alias | Command | Description |
+|---|---|---|
 | `greet` | `greet_person` | Print a greeting message |
 | `hi` | `greet_person` | Print a greeting message |
 
@@ -229,6 +587,7 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 
 | Alias | Command | Description |
 |---|---|---|
+| `gconf` | `` | Show repository or global options |
 | `mrep` | `python -m webbrowser https://search.maven.org/` | Open: Maven Central Repository Search |
 | `mvn_central` | `python -m webbrowser https://search.maven.org/` | Open: Maven Central Repository Search |
 | `mcrs` | `python -m webbrowser https://search.maven.org/` | Open: Maven Central Repository Search |
@@ -247,8 +606,6 @@ Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 | `greet_person <name>` | `name` — Name to greet. | Print a greeting message. |
 | `kotlin_project_version <dir>` | `dir` — Directory to search (defaults to the current directory). | Detect the Kotlin version configured by the Gradle or Maven project in a directory. |
 | `histfind` | — | Search the full PSReadLine command history for entries containing the given text. |
-| `yaffa_k <options>` | `options` — Extra YAFFA-K options, passed on inside Gradle's --args (e.g. --help) | Regenerate gen/bash-stuff/ with YAFFA-K (the Kotlin generator); run from the YAFFA root. |
-| `_YaffaInvoke <Cmd>` | `Cmd` — PowerShell source to run; extra arguments are appended to it, each single-quoted | Run PowerShell source text, forwarding any extra arguments (re-quoted) as text. |
-| `_YaffaCall <Name> <Cmd> <Desc>` | `Name` — Alias name, shown in the diagnostic line, `Cmd` — PowerShell command to run (see _YaffaInvoke), `Desc` — Optional description, printed in yellow above the diagnostic line (each line of a multi-line desc gets its own line) | Print an optional description (yellow), followed by a "<name> => <cmd>" diagnostic (cmd in cyan), then run cmd, forwarding any extra args. |
-| `_YaffaReqTest <Type> <Target>` | `Type` — Requirement type: file \| dir \| cmd \| env \| expr, `Target` — What to check: a file or dir path, a command name, an environment variable name, or an expression | Check a single precondition: $true if met, $false if not, $null if the requirement type is malformed. |
-| `_YaffaReq <Type> <Target> <Message> <FixRun> <FixMsg> <FixOnFail>` | `Type` — Requirement type: file \| dir \| cmd \| env \| expr (see _YaffaReqTest), `Target` — What to check (see _YaffaReqTest), `Message` — Error text shown when the requirement is unmet, `FixRun` — Optional command run to fix an unmet requirement before giving up, `FixMsg` — Optional text shown while running FixRun (default: "Fixing: <target>"), `FixOnFail` — What to do if the fix doesn't help: abort (default) or warn and continue | Evaluate a precondition and apply an optional fix, reporting the outcome. |
+| `yaffa_k <options>` | `options` — Extra YAFFA-K options, passed on inside Gradle's --args (e.g. --help) | Regenerate gen/bash-stuff/ and gen/ps1-stuff/ with YAFFA-K (the Kotlin generator); run from the YAFFA root. |
+| `informExistFolder <folderInfo> <folderName>` | `folderInfo` — Description of the folder, used in the warning (e.g. 'YAFFA user folder')., `folderName` — Path of the folder to check; '~' and relative paths are expanded. | Warn if a folder doesn't exist; returns $true if it exists, $false otherwise. |
+| `Format-HomePath` | — | Shorten a path for display by replacing a leading $HOME with '~'. |

@@ -1,48 +1,33 @@
 # Configure these constants in your PowerShell $PROFILE before dot-sourcing this file:
 #
-#   $env:YAFFA_GEN = "$HOME\.yaffa\gen\ps1-stuff"   # <user folder>\gen\ps1-stuff
+#   $env:YAFFA_USER_FOLDER = "$HOME\.yaffa"   # your user folder
 #   $env:YAFFA_INCL = 'git, kt, mvn, my'   # optional; omit to load all groups
-#   . "$env:YAFFA_GEN\func\incl.ps1"
+#   . "$env:YAFFA_USER_FOLDER\gen\ps1-stuff\func\incl.ps1"
 
-$_wsFunc = $PSScriptRoot
-$_wsRoot = if ($env:YAFFA_GEN)
+<#
+  .SYNOPSIS
+    Shorten a path for display by replacing a leading $HOME with '~'.
+  #>
+function Format-HomePath
 {
-    $env:YAFFA_GEN
-}
-else
-{
-    Split-Path -Parent $_wsFunc
-}
-# The user folder whose config/func/ps1/ functions are dot-sourced last (below)
-# — the same default as the generators.
-$_wsUser = if ($env:YAFFA_USER_FOLDER)
-{
-    $env:YAFFA_USER_FOLDER
-}
-else
-{
-    Join-Path $HOME '.yaffa'
+    param([string]$Path)
+    if (-not $Path)
+    {
+        return $Path
+    }
+    $homeDir = $HOME.TrimEnd('\', '/')
+    if ( $Path.StartsWith($homeDir, [StringComparison]::OrdinalIgnoreCase))
+    {
+        $rest = $Path.Substring($homeDir.Length)
+        # Only match whole folder names: C:\Users\Sten must not match C:\Users\Stenx
+        if ($rest -eq '' -or $rest[0] -in '\', '/')
+        {
+            return '~' + $rest
+        }
+    }
+    $Path
 }
 
-# "name => cmd" steps of an alias chain not printed yet (see _YaffaCall)
-$global:_YaffaSteps = @()
-
-Write-Host "YAFFA are used for adding useful functions and aliases to this shell."
-Write-Host "YAFFA are included and initialized by `"$PSCommandPath`":"
-Write-Host ""
-if (-not $env:YAFFA_INCL)
-{
-    Write-Host ""
-    Write-Host "=> Will loading all available functions and aliases! (No YAFFA_INCL variable found!)"
-} else {
-    Write-Host "Found2 YAFFA_INCL = `"$( $env:YAFFA_INCL )`""
-    Write-Host "=> Content specifies which functions and aliases to load!"
-}
-Write-Host "   _wsRoot = `"$_wsRoot`""
-Write-Host "   _wsFunc = `"$_wsFunc`""
-Write-Host "   _wsUser = `"$_wsUser`""
-Write-Host "   `$PROFILE = `"$PROFILE`""
-Write-Host ""
 
 <#
 .SYNOPSIS
@@ -81,7 +66,7 @@ function _YaffaInvoke
     }
     catch [System.Management.Automation.CommandNotFoundException]
     {
-        Write-Host "  [error] The specified command '$Cmd' is not available! (Maybe NOT implemented if it's YAFFA sourced command!)" -ForegroundColor Red
+        _YaffaMessage error "The specified command '$Cmd' is not available! (Maybe NOT implemented if it's YAFFA sourced command!)"
     }
 }
 
@@ -94,7 +79,10 @@ function _YaffaInvoke
   the diagnostic line. When $Cmd starts with another YAFFA alias (e.g.
   regen-yaffa => yaffa-p), this call is one step of a chain: its line is
   remembered, and the last alias of the chain prints its own description
-  followed by every step line, one per line.
+  followed by every step line, one per line. The description shown is the
+  first alias's, the one the user typed (or the last alias's, when the first
+  has none). A synonym shares its alias's _alias_func_<name> wrapper, so $Name is
+  replaced by the alias name the wrapper was invoked by.
   Usage: _YaffaCall <name> <cmd> [desc] [args...]
 .PARAMETER Name
   Alias name, shown in the diagnostic line
@@ -106,25 +94,49 @@ function _YaffaInvoke
 function _YaffaCall
 {
     param([string]$Name, [string]$Cmd, [string]$Desc = "")
+    $caller = (Get-PSCallStack)[1]
+    $typed = $caller.InvocationInfo.InvocationName
+    if ($typed -and (Get-Alias -Name $typed -ErrorAction SilentlyContinue).Definition -eq $caller.FunctionName)
+    {
+        $Name = $typed
+    }
     $first = ($Cmd.Trim() -split '\s+', 2)[0]
     $alias = Get-Alias -Name $first -ErrorAction SilentlyContinue
-    if ($alias -and $alias.Definition -like '_alias_*')
+    if ($alias -and $alias.Definition -like '_alias_func_*')
     {
-        $global:_YaffaSteps += , @($Name, $Cmd)
+        # The first alias of a chain is the one the user typed: show its
+        # description rather than the last alias's (unless it has none).
+        if (-not $global:_YaffaSteps.Count) { $global:_YaffaDesc = $Desc }
+        $global:_YaffaSteps += ,@($Name, $Cmd)
     }
     else
     {
-        if ($Desc)
-        {
-            foreach ($line in ($Desc.TrimEnd("`r", "`n") -split "`r?`n"))
+        if ($global:_YaffaSteps.Count -and $global:_YaffaDesc) { $Desc = $global:_YaffaDesc }
+        $showDescription = {
+            if ($Desc)
             {
-                Write-Host ("  " + $line) -ForegroundColor Yellow
+                foreach ($line in ($Desc.TrimEnd("`r", "`n") -split "`r?`n"))
+                {
+                    _YaffaWrite $global:_YaffaFormat.description @{ description = $line } -Colors @{ description = 'Yellow' }
+                }
             }
         }
-        foreach ($step in @($global:_YaffaSteps) + , @($Name, $Cmd))
+        $showSteps = {
+            foreach ($step in @($global:_YaffaSteps) + ,@($Name, $Cmd))
+            {
+                _YaffaWrite $global:_YaffaFormat.step @{ name = $step[0]; command = $step[1] } -Colors @{ command = 'Cyan' }
+            }
+        }
+        # Description and steps in the order generator.properties lists them.
+        if ($global:_YaffaFormat.stepsFirst)
         {
-            Write-Host ("  {0} => " -f $step[0]) -NoNewline
-            Write-Host $step[1] -ForegroundColor Cyan
+            . $showSteps
+            . $showDescription
+        }
+        else
+        {
+            . $showDescription
+            . $showSteps
         }
         $global:_YaffaSteps = @()
     }
@@ -172,11 +184,23 @@ function _YaffaReqTest
             return [bool](Invoke-Expression $Target)
         }
         default {
-            Write-Host "  [error] unknown requirement type: '$Type'" -ForegroundColor Red
+            _YaffaMessage error "unknown requirement type: '$Type'"
             Write-Host "Must be one of: file, dir, cmd, env, expr" -ForegroundColor Red
             return $null
         }
     }
+}
+
+<#
+.SYNOPSIS
+  $true if one of the arguments is --help: an alias called for its help skips its requirement checks.
+.DESCRIPTION
+  Mirrors bash's _YaffaHelpAsked(). Usage: _YaffaHelpAsked @args
+#>
+function _YaffaHelpAsked
+{
+    # -ccontains: exactly '--help', as in bash (not '--HELP')
+    return [bool]($args -ccontains '--help')
 }
 
 <#
@@ -215,14 +239,14 @@ function _YaffaReq
 
     if ($FixRun)
     {
-        Write-Host ("  [fix] {0}" -f $( if ($FixMsg)
+        _YaffaMessage fix $( if ($FixMsg)
         {
             $FixMsg
         }
         else
         {
             "Fixing: $Target"
-        } )) -ForegroundColor Yellow
+        } )
         Invoke-Expression $FixRun
         if ((_YaffaReqTest $Type $Target) -eq $true)
         {
@@ -230,62 +254,275 @@ function _YaffaReq
         }
         if ($FixOnFail -eq 'warn')
         {
-            Write-Host "  [warn] $Message" -ForegroundColor Yellow
+            _YaffaMessage warn $Message
             return $true
         }
-        Write-Host "  [error] $Message" -ForegroundColor Red
+        _YaffaMessage error $Message
         return $false
     }
 
-    Write-Host "  [error] $Message" -ForegroundColor Red
+    _YaffaMessage error $Message
     return $false
 }
 
-if ($env:YAFFA_INCL)
+<#
+  .SYNOPSIS
+    The value of one key=value line of a generator.properties file ('#' starts a comment line; a "quoted" value is taken exactly as written between the quotes), or a default.
+  .PARAMETER File
+    The properties file (a missing file gives the default).
+  .PARAMETER Key
+    The key to look up, e.g. output.step.
+  .PARAMETER Default
+    The value when the file has no such key.
+  #>
+function _YaffaProperty
 {
-    Write-Host "YAFFA in 'incl.ps1'! YAFFA_INCL => $( $env:YAFFA_INCL ) (Loading wanted aliases!)"
-    foreach ($_wsG in ($env:YAFFA_INCL -split ','))
+    param([string]$File, [string]$Key, [string]$Default)
+    $value = $Default
+    if ($File -and (Test-Path -LiteralPath $File -PathType Leaf))
     {
-        $_wsG = $_wsG.Trim()
-        if (-not $_wsG)
+        foreach ($line in Get-Content -LiteralPath $File)
+        {
+            if ($line -match '^\s*(#|$)' -or $line -notmatch '=')
+            {
+                continue
+            }
+            $k, $v = $line -split '=', 2
+            if ($k.Trim() -eq $Key)
+            {
+                $value = $v.Trim()
+                if ($value.Length -ge 2 -and $value.StartsWith('"') -and $value.EndsWith('"'))
+                {
+                    $value = $value.Substring(1, $value.Length - 2)
+                }
+            }
+        }
+    }
+    $value
+}
+
+<#
+  .SYNOPSIS
+    Write a template as one line, each <placeholder> replaced by its value (in one pass; an unknown placeholder stays as written).
+  .PARAMETER Template
+    The template, e.g. '  <name> => <command>'.
+  .PARAMETER Values
+    Placeholder names and values, e.g. @{ name = 'hi'; command = 'echo hi' }.
+  .PARAMETER Colors
+    Colors of individual placeholders' values, e.g. @{ command = 'Cyan' }.
+  .PARAMETER Color
+    The color of everything else (default: the console's).
+  #>
+function _YaffaWrite
+{
+    param([string]$Template, [hashtable]$Values, [hashtable]$Colors = @{ }, [string]$Color)
+    foreach ($part in [regex]::Split($Template, '(<[A-Za-z]+>)'))
+    {
+        $text = $part
+        $partColor = $Color
+        if ($part -match '^<([A-Za-z]+)>$' -and $Values.ContainsKey($Matches[1]))
+        {
+            $text = [string]$Values[$Matches[1]]
+            if ($Colors.ContainsKey($Matches[1]))
+            {
+                $partColor = $Colors[$Matches[1]]
+            }
+        }
+        if ($text -eq '')
         {
             continue
         }
-        $_wsF = Join-Path $_wsRoot "alias_$_wsG.ps1"
-        Write-Host "YAFFA in 'incl.ps1'! => $_wsF"
-        if (Test-Path -LiteralPath $_wsF)
+        if ($partColor)
         {
-            . $_wsF
+            Write-Host $text -NoNewline -ForegroundColor $partColor
         }
         else
         {
-            Write-Host "  [warn] no such alias group: $_wsG" -ForegroundColor Yellow
+            Write-Host $text -NoNewline
         }
     }
+    Write-Host ''
 }
-else
+
+<#
+  .SYNOPSIS
+    Write one requirement or runtime message, laid out by output.message.
+  .PARAMETER Level
+    fix, warn or error.
+  .PARAMETER Message
+    What to report.
+  #>
+function _YaffaMessage
 {
-    Write-Host "YAFFA in 'incl.ps1'! YAFFA_INCL NOT FOUND! Loading all available aliases!"
-    foreach ($_wsF in (Get-ChildItem -Path $_wsRoot -Filter 'alias_*.ps1' -File -ErrorAction SilentlyContinue))
+    param([string]$Level, [string]$Message)
+    $color = if ($Level -eq 'error') { 'Red' } else { 'Yellow' }
+    _YaffaWrite $global:_YaffaFormat.message @{ level = $Level; message = $Message } -Color $color
+}
+
+# Output layout (SPEC.md §4), from generator.properties: next to this file in
+# the generated func\, or in config\ when dot-sourced from config\func\ps1\
+# itself. One template per kind of line printed while an alias runs
+# (_YaffaCall, _YaffaReq); a missing key keeps the default layout.
+$_wsProps = Join-Path $PSScriptRoot 'generator.properties'
+if (-not (Test-Path -LiteralPath $_wsProps -PathType Leaf))
+{
+    $_wsProps = Join-Path (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)) 'generator.properties'
+}
+$global:_YaffaFormat = @{
+    description = _YaffaProperty $_wsProps 'output.description' '  <description>'
+    step = _YaffaProperty $_wsProps 'output.step' '  <name> => <command>'
+    message = _YaffaProperty $_wsProps 'output.message' '  [<level>] <message>'
+    # The order of output.description and output.step in the file is the order
+    # they're shown (a key the file doesn't have comes last).
+    stepsFirst = $false
+}
+if (Test-Path -LiteralPath $_wsProps -PathType Leaf)
+{
+    foreach ($_wsLine in Get-Content -LiteralPath $_wsProps)
     {
-        Write-Host "YAFFA in 'incl.ps1'! => $( $_wsF.FullName )"
-        . $_wsF.FullName
+        if ($_wsLine -notmatch '=')
+        {
+            continue
+        }
+        $_wsKey = ($_wsLine -split '=', 2)[0] -replace '\s', ''
+        if ($_wsKey -eq 'output.description')
+        {
+            break
+        }
+        if ($_wsKey -eq 'output.step')
+        {
+            $global:_YaffaFormat.stepsFirst = $true
+            break
+        }
+    }
+    Remove-Variable _wsLine, _wsKey -ErrorAction Ignore
+}
+Remove-Variable _wsProps
+
+<#
+  .SYNOPSIS
+    Print a loading message — only in an interactive session, so a
+    non-interactive one (-NonInteractive, -Command, -File, CI) gets no output
+    from dot-sourcing YAFFA. Warnings are still shown everywhere.
+  #>
+function _YaffaInfo
+{
+    param([string]$Text = '')
+    $quiet = [Environment]::GetCommandLineArgs() | Where-Object { $_ -match '^-(noni|c$|command$|f$|file$)' }
+    if ([Environment]::UserInteractive -and -not $quiet)
+    {
+        Write-Host $Text
     }
 }
 
-foreach ($_wsF in (Get-ChildItem -Path $_wsFunc -Filter '*.ps1' -File -ErrorAction SilentlyContinue))
+function yaffa_main
 {
-    if ($_wsF.FullName -ne $PSCommandPath)
+    _YaffaInfo "YAFFA user folder::: $( Format-HomePath $env:YAFFA_USER_FOLDER )"   # -> ~/.yaffa
+
+    $_wsFunc = $PSScriptRoot
+    # The generated folder (ps1-stuff\) this func\ is in
+    $_wsRoot = Split-Path -Parent $_wsFunc
+    # The user folder whose config/func/ps1/ functions are dot-sourced last (below)
+    # — the same default as the generators.
+    if (-not $env:YAFFA_USER_FOLDER)
     {
+        Write-Warning "Did NOT find `YAFFA_USER_FOLDER` environment variable!"
+        Write-Host "  YAFFA will start with ONLY config files from YAFFA source!"
+        Write-Host "  Add environment variable `YAFFA_USER_FOLDER` to configure where to store personal stuff!"
+    }
+    $_wsUser = if ($env:YAFFA_USER_FOLDER)
+    {
+        $env:YAFFA_USER_FOLDER
+    }
+    else
+    {
+        #TODO Join-Path $HOME '.yaffa'
+        Join-Path $HOME '/code/YAFFA'
+    }
+    _YaffaInfo "YAFFA _wsUser:: $_wsUser"
+
+    # "name => cmd" steps of an alias chain not printed yet (see _YaffaCall)
+    $global:_YaffaSteps = @()
+
+    _YaffaInfo "YAFFA are used for adding useful functions and aliases to this shell."
+    _YaffaInfo "YAFFA are included and initialized by `"$PSCommandPath`":"
+    _YaffaInfo ""
+    if (-not $env:YAFFA_INCL)
+    {
+        _YaffaInfo ""
+        _YaffaInfo "=> _Will load all available functions and aliases! (No YAFFA_INCL variable found!)"
+    }
+    else
+    {
+        _YaffaInfo "Found2 YAFFA_INCL = `"$( $env:YAFFA_INCL )`""
+        _YaffaInfo "=> Content specifies which functions and aliases to load!"
+    }
+    _YaffaInfo "   _wsRoot = `"$_wsRoot`""
+    _YaffaInfo "   _wsFunc = `"$_wsFunc`""
+    _YaffaInfo "   _wsUser = `"$_wsUser`""
+    _YaffaInfo "   `$PROFILE = `"$PROFILE`""
+    _YaffaInfo "   `$YAFFA_INCL = `"$YAFFA_INCL`""
+    _YaffaInfo ""
+
+    if ($env:YAFFA_INCL)
+    {
+        _YaffaInfo "YAFFA in 'incl.ps1'!XXXX YAFFA_INCL => $( $env:YAFFA_INCL ) (Loading wanted aliases!)"
+        foreach ($_wsG in ($env:YAFFA_INCL -split ','))
+        {
+            $_wsG = $_wsG.Trim()
+            if (-not $_wsG)
+            {
+                continue
+            }
+            $_wsF = Join-Path $_wsRoot "alias_$_wsG.ps1"
+            _YaffaInfo "YAFFA in 'incl.ps1'!XXXX 0=> $_wsF"
+            if (Test-Path -LiteralPath $_wsF)
+            {
+                . $_wsF
+            }
+            else
+            {
+                Write-Host "  [warn] no such alias group: $_wsG" -ForegroundColor Yellow
+            }
+        }
+    }
+    else
+    {
+        _YaffaInfo "YAFFA in 'incl.ps1'!XXXX YAFFA_INCL NOT FOUND! Loading all available aliases!"
+        foreach ($_wsF in (Get-ChildItem -Path $_wsRoot -Filter 'alias_*.ps1' -File -ErrorAction SilentlyContinue))
+        {
+            _YaffaInfo "YAFFA in 'incl.ps1'!XXXX 1=> $( $_wsF.FullName )"
+            . $_wsF.FullName
+        }
+    }
+
+    foreach ($_wsF in (Get-ChildItem -Path $_wsFunc -Filter '*.ps1' -File -ErrorAction SilentlyContinue))
+    {
+        if ($_wsF.FullName -ne $PSCommandPath)
+        {
+            _YaffaInfo "YAFFA in 'incl.ps1'!XXXX 2=> . $( $_wsF.FullName )"
+            _YaffaInfo "YAFFA in 'incl.ps1'!XXXX 2=> . $( Format-HomePath $_wsF.FullName )"
+
+            . $_wsF.FullName
+        }
+    }
+    # The user's own functions, straight from their user folder's config/func/ps1/
+    # (not generated), are dot-sourced last, so a function they redefine wins over
+    # the project's. No such folder loads nothing.
+    # (Ignore, unlike SilentlyContinue, also keeps the expected misses out of $Error.)
+    foreach ($_wsF in (Get-ChildItem -Path (Join-Path $_wsUser 'config/func/ps1') -Filter '*.ps1' -File -ErrorAction Ignore | Sort-Object Name))
+    {
+        # Never this file itself: with the YAFFA repo as user folder, its
+        # config/func/ps1/ holds incl.ps1, and dot-sourcing it would recurse forever.
+        if ($_wsF.FullName -eq $PSCommandPath)
+        {
+            continue
+        }
+        _YaffaInfo "YAFFA in 'incl.ps1'!XXXX 3=> . $( $_wsF.FullName )"
         . $_wsF.FullName
     }
-}
-# The user's own functions, straight from their user folder's config/func/ps1/
-# (not generated), are dot-sourced last, so a function they redefine wins over
-# the project's. No such folder loads nothing.
-foreach ($_wsF in (Get-ChildItem -Path (Join-Path $_wsUser 'config/func/ps1') -Filter '*.ps1' -File -ErrorAction SilentlyContinue | Sort-Object Name))
-{
-    . $_wsF.FullName
+
+    Remove-Variable _wsFunc, _wsRoot, _wsUser, _wsG, _wsF -ErrorAction Ignore
 }
 
-Remove-Variable _wsFunc, _wsRoot, _wsUser, _wsG, _wsF -ErrorAction SilentlyContinue
+. yaffa_main

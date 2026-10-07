@@ -20,7 +20,10 @@ function mkcd($dir)
 #>
 function greet_person([string]$name)    # example function for alias "greet"
 {
-    Write-Output "Hello$(if ($name) { ", $name" })!"
+    Write-Output "Hello$( if ($name)
+    {
+        ", $name"
+    } )!"
 }
 
 <#
@@ -35,13 +38,31 @@ function kotlin_project_version([string]$dir = ".")
     $gradleGroovy = Join-Path $dir "build.gradle"
     $pom = Join-Path $dir "pom.xml"
 
-    $gradleFile = if (Test-Path -LiteralPath $gradleKts) { $gradleKts } elseif (Test-Path -LiteralPath $gradleGroovy) { $gradleGroovy } else { $null }
+    $gradleFile = if (Test-Path -LiteralPath $gradleKts)
+    {
+        $gradleKts
+    }
+    elseif (Test-Path -LiteralPath $gradleGroovy)
+    {
+        $gradleGroovy
+    }
+    else
+    {
+        $null
+    }
     if ($gradleFile)
     {
         $content = Get-Content -LiteralPath $gradleFile -Raw
         # Kotlin DSL: kotlin("jvm") version "X"  /  Groovy DSL: id 'org.jetbrains.kotlin.jvm' version 'X'
         $match = [regex]::Match($content, "(?:kotlin\(|id[( ])[""'][^""']*[""']\)?\s+version\s+[""']([^""']+)[""']")
-        $version = if ($match.Success) { $match.Groups[1].Value } else { $null }
+        $version = if ($match.Success)
+        {
+            $match.Groups[1].Value
+        }
+        else
+        {
+            $null
+        }
 
         if (-not $version)
         {
@@ -51,7 +72,10 @@ function kotlin_project_version([string]$dir = ".")
             if (Test-Path -LiteralPath $catalog)
             {
                 $catalogMatch = [regex]::Match((Get-Content -LiteralPath $catalog -Raw), '(?m)^\s*kotlin\s*=\s*"([^"]+)"')
-                if ($catalogMatch.Success) { $version = $catalogMatch.Groups[1].Value }
+                if ($catalogMatch.Success)
+                {
+                    $version = $catalogMatch.Groups[1].Value
+                }
             }
         }
 
@@ -71,11 +95,17 @@ function kotlin_project_version([string]$dir = ".")
         # own <version> is usually set — before falling back to a literal plugin version.
         $version = $null
         $propMatch = [regex]::Match($content, '<kotlin\.version>([^<]+)</kotlin\.version>')
-        if ($propMatch.Success) { $version = $propMatch.Groups[1].Value }
+        if ($propMatch.Success)
+        {
+            $version = $propMatch.Groups[1].Value
+        }
         if (-not $version)
         {
             $pluginMatch = [regex]::Match($content, '<artifactId>kotlin-maven-plugin</artifactId>\s*<version>([^<]+)</version>')
-            if ($pluginMatch.Success) { $version = $pluginMatch.Groups[1].Value }
+            if ($pluginMatch.Success)
+            {
+                $version = $pluginMatch.Groups[1].Value
+            }
         }
 
         if ($version)
@@ -89,13 +119,23 @@ function kotlin_project_version([string]$dir = ".")
         # 'mep' alias), which has parent inheritance already merged/interpolated.
         if (Get-Command mvn -ErrorAction SilentlyContinue)
         {
-            $effectivePom = & mvn -f $pom help:effective-pom 2>$null | Out-String
+            $effectivePom = & mvn -f $pom help:effective-pom 2> $null | Out-String
             $propMatch = [regex]::Match($effectivePom, '<kotlin\.version>([^<]+)</kotlin\.version>')
-            $version = if ($propMatch.Success) { $propMatch.Groups[1].Value } else { $null }
+            $version = if ($propMatch.Success)
+            {
+                $propMatch.Groups[1].Value
+            }
+            else
+            {
+                $null
+            }
             if (-not $version)
             {
                 $pluginMatch = [regex]::Match($effectivePom, '<artifactId>kotlin-maven-plugin</artifactId>\s*<version>([^<]+)</version>')
-                if ($pluginMatch.Success) { $version = $pluginMatch.Groups[1].Value }
+                if ($pluginMatch.Success)
+                {
+                    $version = $pluginMatch.Groups[1].Value
+                }
             }
             if ($version)
             {
@@ -119,16 +159,17 @@ function kotlin_project_version([string]$dir = ".")
 .SYNOPSIS
   Search the full PSReadLine command history for entries containing the given text.
 #>
-function histfind {
+function histfind
+{
     $find = $args;
     Write-Host "Finding in full history using {`$_ -like `"*$find*`"}";
     #Get-Content (Get-PSReadlineOption).HistorySavePath | ? {$_ -like "*$find*"} | Get-Unique | more
-    Get-Content (Get-PSReadlineOption).HistorySavePath | Where-Object {$_ -like "*$find*"} | Get-Unique | more
+    Get-Content (Get-PSReadlineOption).HistorySavePath | Where-Object { $_ -like "*$find*" } | Get-Unique | more
 }
 
 <#
 .SYNOPSIS
-  Regenerate gen/bash-stuff/ with YAFFA-K (the Kotlin generator); run from the YAFFA root.
+  Regenerate gen/bash-stuff/ and gen/ps1-stuff/ with YAFFA-K (the Kotlin generator); run from the YAFFA root.
 .DESCRIPTION
   Gradle only hands the app what's inside --args="...", so extra options
   must go in there — appended after the command they'd reach Gradle itself.
@@ -137,5 +178,31 @@ function histfind {
 #>
 function yaffa_k
 {
-    & .\YAFFA-K\gradlew.bat -p YAFFA-K -q run "--args=--shell=bash --mode=file --config-dir=../config $args"
+    & .\YAFFA-K\gradlew.bat -p YAFFA-K -q run "--args=generate $args"
+}
+
+<#
+.SYNOPSIS
+  Warn if a folder doesn't exist; returns $true if it exists, $false otherwise.
+.PARAMETER folderInfo
+  Description of the folder, used in the warning (e.g. 'YAFFA user folder').
+.PARAMETER folderName
+  Path of the folder to check; '~' and relative paths are expanded.
+#>
+function informExistFolder
+{
+    param(
+        [string]$folderInfo = 'Folder',
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string]$folderName
+    )
+
+    $folderNameExpanded = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($folderName)
+    if (-not (Test-Path -Path $folderNameExpanded -PathType Container))
+    {
+        Write-Warning "$folderInfo does not exist: '$folderName' => '$folderNameExpanded'"
+        return $false
+    }
+    return $true
 }

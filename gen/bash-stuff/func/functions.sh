@@ -1,17 +1,17 @@
-#!/bin/bash
+# shellcheck shell=bash
 # BASH-STUFF functions — edit this file directly, then run: bafs reload
 
 # @description Create a directory and immediately cd into it
 # @param dir string Directory path to create and enter
 
-mkcd() {
+function mkcd() {
   mkdir -p "$1" && cd "$1"
 }
 
 # @description Print a greeting message
 # @param names string One or more names to greet
 
-greet_person() {  # example function for alias "greet"
+function greet_person() {  # example function for alias "greet"
   local joined
   joined="$(printf '%s, ' "$@")"
   joined="${joined%, }"
@@ -21,7 +21,7 @@ greet_person() {  # example function for alias "greet"
 # @description Detect the Kotlin version configured by the Gradle or Maven project in a directory
 # @param dir string Directory to search (defaults to the current directory)
 
-kotlin_project_version() {
+function kotlin_project_version() {
   local dir="${1:-.}" file version
 
   for file in "$dir/build.gradle.kts" "$dir/build.gradle"; do
@@ -82,11 +82,11 @@ kotlin_project_version() {
   return 1
 }
 
-# @description Regenerate gen/bash-stuff/ with YAFFA-K (the Kotlin generator); run from the YAFFA root
+# @description Regenerate gen/bash-stuff/ and gen/ps1-stuff/ with YAFFA-K (the Kotlin generator); run from the YAFFA root
 # @param options string Extra YAFFA-K options, passed on inside Gradle's --args (e.g. --help)
 
-yaffa_k() {
+function yaffa_k() {
   # Gradle only hands the app what's inside --args="...", so extra options
   # must go in there — appended after the command they'd reach Gradle itself.
-  ./YAFFA-K/gradlew -p YAFFA-K -q run --args="--shell=bash --mode=file --config-dir=../config $*"
+  ./YAFFA-K/gradlew -p YAFFA-K -q run --args="generate $*"
 }
