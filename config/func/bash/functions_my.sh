@@ -1,8 +1,8 @@
 #!/bin/bash
 # BASH-STUFF functions — edit this file directly, then run: bafs reload
 
-# @description A function usable for showing pretty-prints output from a alias command,by piping into this command (alias | pretty_aliases)
-pretty_aliases() {
+# @description A function usable for showing pretty-prints output from a alias command,by piping into this command (alias | _show_pretty)
+function _show_pretty() {
   # Split "alias name='value'" on the first '=' only; the value can hold spaces and '='
   awk '{
     sub(/^alias /, "")
@@ -16,7 +16,7 @@ pretty_aliases() {
 # @description Print a greeting message
 # @param names string One or more names to greet
 
-greet_person() { # example function for alias "greet"
+function greet_person() { # example function for alias "greet"
   local joined
   joined="$(printf '%s, ' "$@")"
   joined="${joined%, }"
@@ -26,7 +26,7 @@ greet_person() { # example function for alias "greet"
 # @description Print a greeting message
 # @param names string One or more names to greet
 
-greet_yaffa() { # example function
+function greet_yaffa() { # example function
   echo "Hello YAFFA!"
 }
 

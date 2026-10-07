@@ -1,6 +1,6 @@
 # yaffa-user
 
-This project contains a personal user folder, for [YAFFA](https://github.com/stenaksel/YAFFA) users.
+This project ([yaffa-user](https://github.com/stenaksel/yaffa-user)) is an example of a personal user folder, for [YAFFA](https://github.com/stenaksel/YAFFA) users.
 Public for [YAFFA](https://github.com/stenaksel/YAFFA)-users to copy and use for their own YAFFA user folder.
 
 The location for the user folder can be configured using the environment variable `YAFFA_USER_FOLDER`
@@ -83,8 +83,8 @@ classDiagram
     AliasFile "1" *-- "many" AliasDeclaration : aliases
     RequirementDeclaration <|-- AliasDeclaration
     AliasDeclaration "1" *-- "1" Command
-    RequirementDeclaration "1" o-- "0..*" Requirement : requires
-    RequirementDeclaration "1" o-- "0..*" RequirementRef : requires splice
+    RequirementDeclaration "1" *-- "0..*" Requirement : requires
+    RequirementDeclaration "1" *-- "0..*" RequirementRef : requires splice
     Requirement "1" *-- "1" FixAction : fix
 ```
 

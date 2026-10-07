@@ -1,13 +1,17 @@
 title: alias_overrides - My overrides of aliases from YAFFA
+# This file includes my wanted overrides of aliases outside the YAFFA repo.
+# If you want to override an alias from YAFFA, add it here.
+# An alias here with the same name as a project alias replaces it.
+# You MUST add 'overrides' to the YAFFA_INCL environment variable to use these overrides.
 
 aliases:
   - name: a4g
     description: Show all git related aliases (pretty)
     command:
-      bash: alias-match git | pretty_aliases
+      bash: alias-match git | _show_pretty
 
   - name: a4g-
     description: Show all NONE git related aliases (pretty)
     command:
-      bash: alias-match - git | pretty_aliases
+      bash: alias-match - git | _show_pretty
 

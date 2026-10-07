@@ -8,12 +8,18 @@ aliases:
   - name: a4g
     description: Show all git related aliases (pretty)
     command:
-      bash: alias-match git | pretty_aliases
+      bash: alias-match git | _show_pretty
 
   - name: a4g-
     description: Show all NONE git related aliases (pretty)
     command:
-      bash: alias-match - git | pretty_aliases
+      bash: alias-match - git | _show_pretty
+
+  - name: gconf
+    description: Show repository or global options
+    command:
+      bash: git config --list --show-origin
+
 
   - name: mrep
     command: python -m webbrowser https://search.maven.org/
