@@ -368,7 +368,7 @@ if [[ -n "${YAFFA_INCL:-}" ]]; then
     fi
   done
 else
-  _YaffaInfo '\nFound no YAFFA_INCL variable! Will loading all available aliases! (YAFFA info from "incl.sh"!)\n'
+  _YaffaInfo '\nFound no YAFFA_INCL variable! Will load all available aliases! (YAFFA info from "incl.sh"!)\n'
   for _bs_f in "${_bs_root}"/alias_*.sh; do
     _YaffaInfo ' => %s\n' "${_bs_f/#"$HOME"/\~}"
     if [[ -f "$_bs_f" ]]; then
